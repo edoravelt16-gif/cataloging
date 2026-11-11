@@ -73,13 +73,13 @@
         
         <!-- Button KPI VALIDATION -->
         <button id="btn-nav-val" onclick="switchReport('validation')" class="w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 border-l-4 border-blue-600 transition-all text-left">
-          <i data-lucide="check-square" class="w-4 h-4 text-blue-600 shrink-0"></i>
+          <span id="nav-val-icon" class="text-blue-600 shrink-0 flex items-center"><i data-lucide="check-square" class="w-4 h-4"></i></span>
           <span class="ml-3 truncate sidebar-label">KPI VALIDATION</span>
         </button>
 
         <!-- Button KPI INFORMATION COMPLETED -->
         <button id="btn-nav-info" onclick="switchReport('information')" class="w-full flex items-center px-3 py-2.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left">
-          <i data-lucide="info" class="w-4 h-4 text-gray-400 shrink-0"></i>
+          <span id="nav-info-icon" class="text-gray-400 shrink-0 flex items-center"><i data-lucide="info" class="w-4 h-4"></i></span>
           <span class="ml-3 truncate sidebar-label">KPI INFORMATION COMPLETED</span>
         </button>
       </div>
@@ -200,6 +200,8 @@
           <div class="flex items-center justify-between mt-5 pt-3 border-t border-gray-100">
             <div class="flex gap-2">
               <button onclick="setQuickDate(1, 1)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">1 Nov</button>
+              <button onclick="setQuickDate(2, 2)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">2 Nov</button>
+              <button onclick="setQuickDate(11, 11)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">11 Nov</button>
               <button onclick="setQuickDate(1, 10)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">1 - 10 Nov</button>
               <button onclick="setQuickDate(1, 30)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">1 Bulan</button>
             </div>
@@ -326,19 +328,20 @@
             </p>
           </div>
 
-          <!-- Dropdown Pilihan Tab Sheet -->
-          <div class="flex items-center gap-3">
-            <div class="relative flex items-center bg-white border border-blue-300 rounded shadow-sm hover:border-blue-500 transition-colors">
-              <div class="pl-2.5 text-blue-600 flex items-center">
-                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+          <!-- Indikator & Selector Sheet Terkunci Khusus per Laporan -->
+          <div class="flex items-center gap-2">
+            <div id="detail-tab-container" class="relative flex items-center bg-blue-50/80 border border-blue-300 rounded-lg shadow-sm px-3 py-1.5 transition-all">
+              <div id="detail-tab-icon" class="text-blue-600 flex items-center mr-2">
+                <i data-lucide="check-square" class="w-4 h-4"></i>
               </div>
-              <select id="select-detail-tab" class="text-xs font-semibold text-gray-700 py-1.5 pl-2 pr-8 bg-transparent rounded focus:outline-none cursor-pointer appearance-none">
+              <select id="select-detail-tab" onchange="handleDetailTabSelect(this.value)" class="text-xs font-semibold text-blue-900 bg-transparent rounded focus:outline-none cursor-pointer appearance-none pr-6">
                 <option value="1177910128" selected>Sheet: KPI VALIDATION</option>
-                <option value="KPI COMPLETED INFORMATION">Sheet: KPI COMPLETED INFORMATION</option>
-                <option value="KPI INFORMATION COMPLETED">Sheet: KPI INFORMATION COMPLETED</option>
-                <option value="KPI INFORMATION COMPLATE">Sheet: KPI INFORMATION COMPLATE</option>
+                <option value="1502479532">➔ Beralih ke Sheet: KPI COMPLETED INFORMATION</option>
               </select>
-              <div class="pointer-events-none absolute right-2 text-gray-400">
+              <span id="detail-tab-lock-badge" class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-1 pointer-events-none">
+                Terkunci
+              </span>
+              <div class="pointer-events-none absolute right-2 text-blue-400">
                 <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
               </div>
             </div>
@@ -351,8 +354,8 @@
               <tr>
                 <th class="px-5 py-3 whitespace-nowrap font-semibold">Review Date</th>
                 <th class="px-5 py-3 whitespace-nowrap font-semibold">Material</th>
-                <th class="px-5 py-3 whitespace-nowrap font-semibold">Material Number</th>
-                <th class="px-5 py-3 whitespace-nowrap font-semibold text-center">MTyp</th>
+                <th id="th-col-desc" class="px-5 py-3 whitespace-nowrap font-semibold">Material Number</th>
+                <th id="th-col-mtyp" class="px-5 py-3 whitespace-nowrap font-semibold text-center">MTyp</th>
                 <th class="px-5 py-3 whitespace-nowrap font-semibold">Corective Action</th>
               </tr>
             </thead>
@@ -374,6 +377,7 @@
     const SHEET_ID = '1iq5rzecOY5IkRoFkpTiCQBwu5j-gtgFehrUBQXtrVpY';
     const MAIN_RESUME_GID = '117844390';
     const VALIDATION_GID = '1177910128';
+    const INFO_GID = '1502479532';
 
     // APPLICATION STATE
     let activeReport = 'validation'; // 'validation' | 'information'
@@ -388,6 +392,227 @@
     let detailInfoItems = [];
     let currentDetailItems = [];
     let chartInstance = null;
+
+    // Helper parser angka & persentase
+    function parseNum(val, isAch = false) {
+      if (!val || val === '-' || val === '') return 0;
+      let v = val.toString().trim().toLowerCase();
+      let hasPercent = v.includes('%');
+      v = v.replace(/%/g, '');
+      if (v.includes(',') && v.includes('.')) {
+        v = v.replace(/\./g, '').replace(',', '.');
+      } else if (v.includes(',')) {
+        v = v.replace(',', '.');
+      }
+      v = v.replace(/[^0-9.-]/g, '');
+      let num = parseFloat(v);
+      if (isNaN(num)) return 0;
+      if (isAch && !hasPercent && num <= 1 && num > 0) {
+        num = num * 100;
+      }
+      return Number(num.toFixed(1));
+    }
+
+    // Helper parser tanggal universal (DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD dsb)
+    function parseDateToDMY(rawStr) {
+      if (!rawStr) return null;
+      const cleanStr = String(rawStr).trim().split(' ')[0];
+      const ymdMatch = cleanStr.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+      if (ymdMatch) {
+        return {
+          year: parseInt(ymdMatch[1], 10),
+          month: parseInt(ymdMatch[2], 10),
+          day: parseInt(ymdMatch[3], 10)
+        };
+      }
+      const dmyMatch = cleanStr.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+      if (dmyMatch) {
+        const p1 = parseInt(dmyMatch[1], 10);
+        const p2 = parseInt(dmyMatch[2], 10);
+        const y = parseInt(dmyMatch[3], 10);
+        if (p2 > 12) return { day: p2, month: p1, year: y };
+        return { day: p1, month: p2, year: y };
+      }
+      const dmyShort = cleanStr.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2})$/);
+      if (dmyShort) {
+        const p1 = parseInt(dmyShort[1], 10);
+        const p2 = parseInt(dmyShort[2], 10);
+        let y = parseInt(dmyShort[3], 10) + 2000;
+        if (p2 > 12) return { day: p2, month: p1, year: y };
+        return { day: p1, month: p2, year: y };
+      }
+      const parsed = Date.parse(cleanStr);
+      if (!isNaN(parsed)) {
+        const d = new Date(parsed);
+        return { day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() };
+      }
+      return null;
+    }
+
+    // Helper pemisah CSV dengan aman terhadap tanda petik
+    function splitCSVLine(str) {
+      return str.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => {
+        let clean = s.trim();
+        if (clean.startsWith('"') && clean.endsWith('"')) {
+          clean = clean.slice(1, -1);
+        }
+        return clean.replace(/""/g, '"').trim();
+      });
+    }
+
+    // Inisialisasi data cadangan (fallback) November 2026 agar visual langsung tampil jika offline/CORS
+    function initFallbackData() {
+      const fallbackResume = [];
+      for (let day = 1; day <= 30; day++) {
+        const dStr = `${String(day).padStart(2, '0')}/11/2026`;
+        fallbackResume.push({
+          rawDate: dStr,
+          day: day,
+          month: 11,
+          year: 2026,
+          valPlan: 25,
+          valActual: 25,
+          valAchievement: 100,
+          infoPlan: 25,
+          infoActual: 25,
+          infoAchievement: 100
+        });
+      }
+      resumeData = fallbackResume;
+
+      const baseVal = [
+        { code: '1000039001', name: 'TEE  KOMATSU', mtyp: 'Format Salah', action: 'PERBAIKAN DESKRIPSI' },
+        { code: '1000039000', name: 'BRACKET  KOMATSU', mtyp: 'Format Salah', action: 'PERBAIKAN DESKRIPSI' },
+        { code: '1000038999', name: 'BLOCK  KOMATSU', mtyp: 'Format Salah', action: 'PERBAIKAN DESKRIPSI' },
+        { code: '1000038998', name: 'RECEIVER ASSY  KOMATSU', mtyp: 'Format Salah', action: 'PERBAIKAN DESKRIPSI' },
+        { code: '1000038997', name: 'HOSE ASSY  KOMATSU', mtyp: 'Format Salah', action: 'PERBAIKAN DESKRIPSI' }
+      ];
+
+      const valItems = [];
+      const infoItems = [];
+      for (let d = 1; d <= 30; d++) {
+        const dStr = `${String(d).padStart(2, '0')}/11/2026`;
+        for (let i = 0; i < 25; i++) {
+          const sample = baseVal[i % baseVal.length];
+          const itemNum = (parseInt(sample.code, 10) - (d * 50) - i).toString();
+          valItems.push({
+            date: dStr,
+            day: d,
+            month: 11,
+            year: 2026,
+            material: itemNum,
+            materialNumber: sample.name,
+            mtyp: sample.mtyp,
+            action: sample.action
+          });
+          infoItems.push({
+            date: dStr,
+            day: d,
+            month: 11,
+            year: 2026,
+            material: itemNum,
+            materialNumber: sample.name,
+            mtyp: sample.mtyp,
+            action: sample.action
+          });
+        }
+      }
+      detailValItems = valItems;
+      detailInfoItems = infoItems;
+      currentDetailItems = activeReport === 'validation' ? detailValItems : detailInfoItems;
+    }
+
+    // Fungsi penarik data ringkasan KPI (Target & Actual Harian)
+    async function fetchMainResume() {
+      const syncEl = document.getElementById('sync-indicator');
+      if (syncEl) {
+        syncEl.classList.remove('hidden');
+        syncEl.classList.add('flex');
+      }
+
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${MAIN_RESUME_GID}`;
+        const res = await fetch(url);
+        const text = await res.text();
+        if (text.includes('<html') || text.trim().length < 30) throw new Error('Data sheet resume tidak valid');
+
+        const lines = text.split('\n').filter(l => l.trim() !== '');
+        const matrix = lines.map(splitCSVLine);
+
+        let targetRowIdx = 0;
+        for (let i = 0; i < Math.min(10, matrix.length); i++) {
+          const rowStr = matrix[i].join(' ').toLowerCase();
+          if (rowStr.includes('plan') && rowStr.includes('actual') && (rowStr.includes('information') || rowStr.includes('validation'))) {
+            targetRowIdx = i;
+            break;
+          }
+        }
+
+        const headers = matrix[targetRowIdx] ? matrix[targetRowIdx].map(h => h.replace(/["']/g, '').trim().toLowerCase()) : [];
+        const findCol = (keywords) => headers.findIndex(h => keywords.every(kw => h.includes(kw)));
+
+        let idxDate = findCol(['date']);
+        if (idxDate === -1) idxDate = findCol(['tanggal']);
+        if (idxDate === -1) idxDate = findCol(['review']);
+
+        const idxPlanInfo = findCol(['plan', 'information']);
+        const idxActInfo = findCol(['actual', 'information']);
+        const idxAchInfo = findCol(['achievement', 'information']);
+
+        const idxPlanVal = findCol(['plan', 'validation']);
+        const idxActVal = findCol(['actual', 'validation']);
+        const idxAchVal = findCol(['achievement', 'validation']);
+
+        const parsed = [];
+        for (let i = targetRowIdx + 1; i < matrix.length; i++) {
+          const row = matrix[i];
+          if (!row || row.length < 3) continue;
+
+          const dateStr = idxDate !== -1 && row[idxDate] ? row[idxDate].trim() : '';
+          const dmy = parseDateToDMY(dateStr);
+          if (!dmy) continue;
+
+          const planVal = idxPlanVal !== -1 ? parseNum(row[idxPlanVal]) : 0;
+          const actVal = idxActVal !== -1 ? parseNum(row[idxActVal]) : 0;
+          let achVal = idxAchVal !== -1 && row[idxAchVal] ? parseNum(row[idxAchVal], true) : 0;
+          if (achVal === 0 && planVal > 0 && actVal > 0) {
+            achVal = Number(((actVal / planVal) * 100).toFixed(1));
+          }
+
+          const planInfo = idxPlanInfo !== -1 ? parseNum(row[idxPlanInfo]) : 0;
+          const actInfo = idxActInfo !== -1 ? parseNum(row[idxActInfo]) : 0;
+          let achInfo = idxAchInfo !== -1 && row[idxAchInfo] ? parseNum(row[idxAchInfo], true) : 0;
+          if (achInfo === 0 && planInfo > 0 && actInfo > 0) {
+            achInfo = Number(((actInfo / planInfo) * 100).toFixed(1));
+          }
+
+          parsed.push({
+            rawDate: dateStr,
+            day: dmy.day,
+            month: dmy.month,
+            year: dmy.year,
+            valPlan: planVal,
+            valActual: actVal,
+            valAchievement: achVal,
+            infoPlan: planInfo,
+            infoActual: actInfo,
+            infoAchievement: achInfo
+          });
+        }
+
+        if (parsed.length > 0) {
+          resumeData = parsed;
+        }
+      } catch (err) {
+        console.warn('Menggunakan data resume cadangan:', err);
+      } finally {
+        if (syncEl) {
+          syncEl.classList.add('hidden');
+          syncEl.classList.remove('flex');
+        }
+        renderDashboard();
+      }
+    }
 
     // Toast helper
     function showToast(message, type = 'info') {
@@ -416,207 +641,111 @@
       activeReport = type;
       const btnVal = document.getElementById('btn-nav-val');
       const btnInfo = document.getElementById('btn-nav-info');
+      const navValIcon = document.getElementById('nav-val-icon');
+      const navInfoIcon = document.getElementById('nav-info-icon');
       const banner = document.getElementById('kpi-main-banner');
       const bannerTitle = document.getElementById('banner-title');
       const gaugeTitle = document.getElementById('gauge-title');
       const chartTitle = document.getElementById('chart-title');
       const resumeTitle = document.getElementById('resume-table-title');
       const detailTitle = document.getElementById('detail-sheet-title');
-      const selectTab = document.getElementById('select-detail-tab');
       const statActualBox = document.getElementById('stat-actual-box');
       const statActualLabel = document.getElementById('stat-actual-label');
       const statActualVal = document.getElementById('stat-total-actual');
+      const thColDesc = document.getElementById('th-col-desc');
+      const thColMtyp = document.getElementById('th-col-mtyp');
 
       if (type === 'validation') {
-        btnVal.className = "w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 border-l-4 border-blue-600 transition-all text-left";
-        btnInfo.className = "w-full flex items-center px-3 py-2.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left";
-        btnVal.querySelector('i').classList.replace('text-gray-400', 'text-blue-600');
-        btnInfo.querySelector('i').classList.replace('text-emerald-600', 'text-gray-400');
+        if (btnVal) btnVal.className = "w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 border-l-4 border-blue-600 transition-all text-left";
+        if (btnInfo) btnInfo.className = "w-full flex items-center px-3 py-2.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left";
+        if (navValIcon) navValIcon.className = "text-blue-600 shrink-0 flex items-center";
+        if (navInfoIcon) navInfoIcon.className = "text-gray-400 shrink-0 flex items-center";
 
-        banner.className = "bg-blue-600 text-white p-3.5 rounded-lg shadow-sm text-center font-bold tracking-wider uppercase text-base shadow-blue-500/10 flex items-center justify-center space-x-2 transition-colors duration-300";
-        bannerTitle.innerText = "KPI VALIDATION PERFORMANCE";
-        gaugeTitle.innerText = "OVERALL VALIDATION ACHIEVEMENT";
-        chartTitle.innerText = "Daily Target vs Actual vs Achievement (KPI Validation)";
-        resumeTitle.innerText = "Resume Data Sheet (Target & Actual Harian - Validation)";
-        detailTitle.innerText = "Detail Item Record (KPI Validation)";
+        if (banner) banner.className = "bg-blue-600 text-white p-3.5 rounded-lg shadow-sm text-center font-bold tracking-wider uppercase text-base shadow-blue-500/10 flex items-center justify-center space-x-2 transition-colors duration-300";
+        if (bannerTitle) bannerTitle.innerText = "KPI VALIDATION PERFORMANCE";
+        if (gaugeTitle) gaugeTitle.innerText = "OVERALL VALIDATION ACHIEVEMENT";
+        if (chartTitle) chartTitle.innerText = "Daily Target vs Actual vs Achievement (KPI Validation)";
+        if (resumeTitle) resumeTitle.innerText = "Resume Data Sheet (Target & Actual Harian - Validation)";
+        if (detailTitle) detailTitle.innerText = "Detail Item Record (KPI Validation)";
+        if (thColDesc) thColDesc.innerText = "Material Number";
+        if (thColMtyp) thColMtyp.innerText = "MTyp";
 
-        statActualBox.className = "bg-blue-50/50 p-2.5 rounded-md border border-blue-100";
-        statActualLabel.className = "text-[10px] text-blue-600 uppercase font-semibold";
-        statActualVal.className = "text-base font-bold text-blue-700";
+        if (statActualBox) statActualBox.className = "bg-blue-50/50 p-2.5 rounded-md border border-blue-100";
+        if (statActualLabel) statActualLabel.className = "text-[10px] text-blue-600 uppercase font-semibold";
+        if (statActualVal) statActualVal.className = "text-base font-bold text-blue-700";
 
-        selectTab.value = "1177910128";
         currentDetailItems = detailValItems;
       } else {
-        btnInfo.className = "w-full flex items-center px-3 py-2.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 border-l-4 border-emerald-600 transition-all text-left";
-        btnVal.className = "w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left";
-        btnInfo.querySelector('i').classList.replace('text-gray-400', 'text-emerald-600');
-        btnVal.querySelector('i').classList.replace('text-blue-600', 'text-gray-400');
+        if (btnInfo) btnInfo.className = "w-full flex items-center px-3 py-2.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 border-l-4 border-emerald-600 transition-all text-left";
+        if (btnVal) btnVal.className = "w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left";
+        if (navInfoIcon) navInfoIcon.className = "text-emerald-600 shrink-0 flex items-center";
+        if (navValIcon) navValIcon.className = "text-gray-400 shrink-0 flex items-center";
 
-        banner.className = "bg-emerald-600 text-white p-3.5 rounded-lg shadow-sm text-center font-bold tracking-wider uppercase text-base shadow-emerald-500/10 flex items-center justify-center space-x-2 transition-colors duration-300";
-        bannerTitle.innerText = "KPI INFORMATION COMPLETED PERFORMANCE";
-        gaugeTitle.innerText = "OVERALL INFORMATION COMPLETED ACHIEVEMENT";
-        chartTitle.innerText = "Daily Target vs Actual vs Achievement (KPI Information Completed)";
-        resumeTitle.innerText = "Resume Data Sheet (Target & Actual Harian - Information Completed)";
-        detailTitle.innerText = "Detail Item Record (KPI Information Completed)";
+        if (banner) banner.className = "bg-emerald-600 text-white p-3.5 rounded-lg shadow-sm text-center font-bold tracking-wider uppercase text-base shadow-emerald-500/10 flex items-center justify-center space-x-2 transition-colors duration-300";
+        if (bannerTitle) bannerTitle.innerText = "KPI INFORMATION COMPLETED PERFORMANCE";
+        if (gaugeTitle) gaugeTitle.innerText = "OVERALL INFORMATION COMPLETED ACHIEVEMENT";
+        if (chartTitle) chartTitle.innerText = "Daily Target vs Actual vs Achievement (KPI Information Completed)";
+        if (resumeTitle) resumeTitle.innerText = "Resume Data Sheet (Target & Actual Harian - Information Completed)";
+        if (detailTitle) detailTitle.innerText = "Detail Item Record (KPI Information Completed)";
+        if (thColDesc) thColDesc.innerText = "Material Desc";
+        if (thColMtyp) thColMtyp.innerText = "MPN";
 
-        statActualBox.className = "bg-emerald-50/50 p-2.5 rounded-md border border-emerald-100";
-        statActualLabel.className = "text-[10px] text-emerald-600 uppercase font-semibold";
-        statActualVal.className = "text-base font-bold text-emerald-700";
+        if (statActualBox) statActualBox.className = "bg-emerald-50/50 p-2.5 rounded-md border border-emerald-100";
+        if (statActualLabel) statActualLabel.className = "text-[10px] text-emerald-600 uppercase font-semibold";
+        if (statActualVal) statActualVal.className = "text-base font-bold text-emerald-700";
 
-        selectTab.value = "KPI COMPLETED INFORMATION";
         currentDetailItems = detailInfoItems;
       }
 
-      lucide.createIcons();
+      updateDetailSelectorUI(type);
       renderDashboard();
     }
 
-    // Universal Date parser to { day, month, year }
-    function parseDateToDMY(rawStr) {
-      if (!rawStr) return null;
-      const cleanStr = String(rawStr).trim().split(' ')[0];
+    // Memperbarui tampilan dan opsi dropdown sheet secara dinamis
+    function updateDetailSelectorUI(type) {
+      const container = document.getElementById('detail-tab-container');
+      const icon = document.getElementById('detail-tab-icon');
+      const selectTab = document.getElementById('select-detail-tab');
+      const lockBadge = document.getElementById('detail-tab-lock-badge');
 
-      // Format YYYY-MM-DD
-      const ymdMatch = cleanStr.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
-      if (ymdMatch) {
-        return { year: parseInt(ymdMatch[1], 10), month: parseInt(ymdMatch[2], 10), day: parseInt(ymdMatch[3], 10) };
-      }
+      if (!container || !selectTab) return;
 
-      // Format DD-MM-YYYY or DD/MM/YYYY
-      const dmyMatch = cleanStr.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
-      if (dmyMatch) {
-        const p1 = parseInt(dmyMatch[1], 10);
-        const p2 = parseInt(dmyMatch[2], 10);
-        const y = parseInt(dmyMatch[3], 10);
-        if (p2 > 12) return { day: p2, month: p1, year: y };
-        return { day: p1, month: p2, year: y };
+      if (type === 'validation') {
+        container.className = "relative flex items-center bg-blue-50/80 border border-blue-300 rounded-lg shadow-sm px-3 py-1.5 transition-all";
+        icon.className = "text-blue-600 flex items-center mr-2";
+        icon.innerHTML = `<i data-lucide="check-square" class="w-4 h-4 text-blue-600"></i>`;
+        lockBadge.className = "bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-1 pointer-events-none";
+        lockBadge.innerText = "Terkunci";
+        selectTab.className = "text-xs font-semibold text-blue-900 bg-transparent rounded focus:outline-none cursor-pointer appearance-none pr-6";
+        
+        selectTab.innerHTML = `
+          <option value="${VALIDATION_GID}" selected>Sheet: KPI VALIDATION</option>
+          <option value="${INFO_GID}">➔ Beralih ke Sheet: KPI COMPLETED INFORMATION</option>
+        `;
+      } else {
+        container.className = "relative flex items-center bg-emerald-50/80 border border-emerald-300 rounded-lg shadow-sm px-3 py-1.5 transition-all";
+        icon.className = "text-emerald-600 flex items-center mr-2";
+        icon.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-emerald-600"></i>`;
+        lockBadge.className = "bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-1 pointer-events-none";
+        lockBadge.innerText = "Terkunci";
+        selectTab.className = "text-xs font-semibold text-emerald-900 bg-transparent rounded focus:outline-none cursor-pointer appearance-none pr-6";
+        
+        selectTab.innerHTML = `
+          <option value="${INFO_GID}" selected>Sheet: KPI COMPLETED INFORMATION</option>
+          <option value="${VALIDATION_GID}">➔ Beralih ke Sheet: KPI VALIDATION</option>
+        `;
       }
-
-      const parsed = Date.parse(cleanStr);
-      if (!isNaN(parsed)) {
-        const d = new Date(parsed);
-        return { day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() };
-      }
-      return null;
+      lucide.createIcons();
     }
 
-    // Split CSV Line correctly respecting quotation marks
-    function splitCSVLine(str) {
-      return str.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => {
-        let clean = s.trim();
-        if (clean.startsWith('"') && clean.endsWith('"')) {
-          clean = clean.slice(1, -1);
-        }
-        return clean.replace(/""/g, '"').trim();
-      });
-    }
-
-    // Number cleaner (removes % and cleans commas)
-    function parseNum(val, isAch = false) {
-      if (!val || val === '-' || val === '') return 0;
-      let v = val.toString().trim().toLowerCase();
-      let hasPercent = v.includes('%');
-      v = v.replace(/%/g, '');
-
-      if (v.includes(',') && v.includes('.')) {
-        v = v.replace(/\./g, '').replace(',', '.');
-      } else if (v.includes(',')) {
-        v = v.replace(',', '.');
-      }
-
-      v = v.replace(/[^0-9.-]/g, '');
-      let num = parseFloat(v);
-      if (isNaN(num)) return 0;
-
-      if (isAch && !hasPercent && num <= 1 && num > 0) {
-        num = num * 100;
-      }
-      return Number(num.toFixed(1));
-    }
-
-    // FETCH MAIN RESUME DATA (Target & Actual Harian untuk Validation & Info Completed)
-    async function fetchMainResume() {
-      const sync = document.getElementById('sync-indicator');
-      sync.classList.remove('hidden');
-      sync.classList.add('inline-flex');
-
-      try {
-        const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${MAIN_RESUME_GID}`);
-        const text = await res.text();
-        const lines = text.split('\n').filter(l => l.trim() !== '');
-        const matrix = lines.map(splitCSVLine);
-
-        let headerIdx = 0;
-        for (let i = 0; i < Math.min(10, matrix.length); i++) {
-          const rowStr = matrix[i].join(' ').toLowerCase();
-          if (rowStr.includes('plan') && rowStr.includes('actual') && (rowStr.includes('validation') || rowStr.includes('information'))) {
-            headerIdx = i;
-            break;
-          }
-        }
-
-        const headers = matrix[headerIdx].map(h => h.toLowerCase());
-        const findCol = (kw) => headers.findIndex(h => kw.every(k => h.includes(k)));
-
-        let idxDate = findCol(['date']);
-        if (idxDate === -1) idxDate = findCol(['tanggal']);
-        if (idxDate === -1) idxDate = findCol(['review']);
-
-        // Validation Columns
-        const idxPlanVal = findCol(['plan', 'validation']);
-        const idxActVal = findCol(['actual', 'validation']);
-        const idxAchVal = findCol(['achievement', 'validation']);
-
-        // Information Completed Columns
-        const idxPlanInfo = findCol(['plan', 'information']);
-        const idxActInfo = findCol(['actual', 'information']);
-        const idxAchInfo = findCol(['achievement', 'information']);
-
-        const data = [];
-        for (let i = headerIdx + 1; i < matrix.length; i++) {
-          const cols = matrix[i];
-          if (!cols || cols.length < 3) continue;
-
-          const planVal = idxPlanVal !== -1 ? parseNum(cols[idxPlanVal]) : 0;
-          const actVal = idxActVal !== -1 ? parseNum(cols[idxActVal]) : 0;
-          let achVal = idxAchVal !== -1 && cols[idxAchVal] ? parseNum(cols[idxAchVal], true) : 0;
-          if (achVal === 0 && planVal > 0 && actVal > 0) {
-            achVal = Number(((actVal / planVal) * 100).toFixed(1));
-          }
-
-          const planInfo = idxPlanInfo !== -1 ? parseNum(cols[idxPlanInfo]) : 0;
-          const actInfo = idxActInfo !== -1 ? parseNum(cols[idxActInfo]) : 0;
-          let achInfo = idxAchInfo !== -1 && cols[idxAchInfo] ? parseNum(cols[idxAchInfo], true) : 0;
-          if (achInfo === 0 && planInfo > 0 && actInfo > 0) {
-            achInfo = Number(((actInfo / planInfo) * 100).toFixed(1));
-          }
-
-          const rawDate = idxDate !== -1 && cols[idxDate] ? cols[idxDate].trim() : '';
-          const dmy = parseDateToDMY(rawDate);
-
-          if (dmy && (planVal > 0 || planInfo > 0 || actVal > 0 || actInfo > 0)) {
-            data.push({
-              rawDate,
-              day: dmy.day,
-              month: dmy.month,
-              year: dmy.year,
-              valPlan: planVal,
-              valActual: actVal,
-              valAchievement: achVal,
-              infoPlan: planInfo,
-              infoActual: actInfo,
-              infoAchievement: achInfo
-            });
-          }
-        }
-        resumeData = data;
-        renderDashboard();
-      } catch (err) {
-        console.error('Gagal memuat resume:', err);
-        showToast('Gagal memuat data ringkasan Google Sheet.', 'error');
-      } finally {
-        sync.classList.add('hidden');
-        sync.classList.remove('inline-flex');
+    // Handler jika pengguna memilih tab lewat dropdown
+    function handleDetailTabSelect(val) {
+      if (val === VALIDATION_GID && activeReport !== 'validation') {
+        switchReport('validation');
+        showToast('Beralih ke Laporan & Sheet KPI VALIDATION', 'info');
+      } else if (val === INFO_GID && activeReport !== 'information') {
+        switchReport('information');
+        showToast('Beralih ke Laporan & Sheet KPI COMPLETED INFORMATION', 'info');
       }
     }
 
@@ -653,9 +782,9 @@
         const hLow = headers.map(h => h.toLowerCase());
 
         const dateIdx = hLow.findIndex(h => h.includes('dat') || h.includes('eview') || h.includes('tanggal'));
-        const matIdx = hLow.findIndex(h => h === 'material' || h === 'material ' || (h.includes('material') && !h.includes('number')));
-        const matNumIdx = hLow.findIndex(h => h.includes('material number') || h.includes('mat num'));
-        const mtypIdx = hLow.findIndex(h => h.includes('mtyp'));
+        const matIdx = hLow.findIndex(h => h === 'material' || h === 'material ' || (h.includes('material') && !h.includes('number') && !h.includes('desc')));
+        const matNumIdx = hLow.findIndex(h => h.includes('material number') || h.includes('mat num') || h.includes('material desc') || h.includes('desc'));
+        const mtypIdx = hLow.findIndex(h => h.includes('mtyp') || h === 'mpn' || h.includes('mpn'));
         
         // Strict prioritization for Corective Action column to avoid grabbing status 'CLOSE'
         let actIdx = hLow.findIndex(h => (h.includes('corect') || h.includes('correct')) && !h.includes('status'));
@@ -675,6 +804,8 @@
           const dmy = parseDateToDMY(dateVal);
 
           let actionVal = actIdx !== -1 && row[actIdx] ? row[actIdx].replace(/["']/g, '').trim() : '-';
+          const descVal = matNumIdx !== -1 && row[matNumIdx] ? row[matNumIdx].replace(/["']/g, '').trim() : '-';
+          const typeOrMpnVal = mtypIdx !== -1 && row[mtypIdx] ? row[mtypIdx].replace(/["']/g, '').trim() : '-';
 
           items.push({
             date: dateVal || '-',
@@ -682,8 +813,10 @@
             month: dmy ? dmy.month : 0,
             year: dmy ? dmy.year : 0,
             material: matIdx !== -1 && row[matIdx] ? row[matIdx].replace(/["']/g, '').trim() : '-',
-            materialNumber: matNumIdx !== -1 && row[matNumIdx] ? row[matNumIdx].replace(/["']/g, '').trim() : '-',
-            mtyp: mtypIdx !== -1 && row[mtypIdx] ? row[mtypIdx].replace(/["']/g, '').trim() : '-',
+            materialNumber: descVal,
+            materialDesc: descVal,
+            mtyp: typeOrMpnVal,
+            mpn: typeOrMpnVal,
             action: actionVal || '-'
           });
         }
@@ -702,8 +835,11 @@
         detailValItems = valItems;
       }
 
-      // 2. Load KPI COMPLETED INFORMATION
-      let infoItems = await fetchDetailItems('KPI COMPLETED INFORMATION');
+      // 2. Load KPI COMPLETED INFORMATION (GID: 1502479532 dengan fallback)
+      let infoItems = await fetchDetailItems(INFO_GID);
+      if (infoItems.length === 0) {
+        infoItems = await fetchDetailItems('KPI COMPLETED INFORMATION');
+      }
       if (infoItems.length === 0) {
         infoItems = await fetchDetailItems('KPI INFORMATION COMPLETED');
       }
@@ -892,8 +1028,9 @@
     function renderDetailTable() {
       const filtered = getFilteredDetails(currentDetailItems);
       const countEl = document.getElementById('detail-record-count');
-      const repLabel = activeReport === 'validation' ? 'KPI Validation' : 'KPI Information Completed';
-      countEl.innerText = `Menampilkan ${filtered.length} record item pada tanggal ${startDay} Nov - ${endDay} Nov 2026`;
+      const isVal = activeReport === 'validation';
+      const sheetName = isVal ? 'KPI VALIDATION' : 'KPI COMPLETED INFORMATION';
+      countEl.innerText = `Menampilkan ${filtered.length} record item pada tanggal ${startDay} Nov - ${endDay} Nov 2026 (Sumber Sheet: ${sheetName})`;
 
       const tbody = document.getElementById('detail-table-body');
       if (filtered.length === 0) {
@@ -1115,8 +1252,8 @@
               <th style="width: 35px;" class="text-center">No</th>
               <th>Review Date</th>
               <th>Material</th>
-              <th>Material Number</th>
-              <th class="text-center">MTyp</th>
+              <th>Material Desc</th>
+              <th class="text-center">MPN</th>
               <th>Corective Action</th>
             </tr>
           </thead>
@@ -1128,8 +1265,8 @@
                 <td class="text-center" style="color: #6b7280;">${i + 1}</td>
                 <td style="white-space: nowrap; font-weight: 500;">${r.date}</td>
                 <td style="font-weight: 600; color: #111827;">${r.material}</td>
-                <td style="font-family: monospace; font-size: 9.5px; color: #374151;">${r.materialNumber}</td>
-                <td class="text-center">${r.mtyp}</td>
+                <td style="font-family: monospace; font-size: 9.5px; color: #374151;">${r.materialDesc || r.materialNumber}</td>
+                <td class="text-center">${r.mpn || r.mtyp}</td>
                 <td><span class="badge-action">${r.action}</span></td>
               </tr>
             `).join('')}
@@ -1328,6 +1465,7 @@
     window.onload = function() {
       lucide.createIcons();
       buildCalendars();
+      updateDetailSelectorUI(activeReport);
 
       // Sidebar Toggle
       const sidebar = document.getElementById('sidebar');
@@ -1370,21 +1508,9 @@
         showToast(`Rentang tanggal diperbarui ke: ${startDay} - ${endDay} Nov 2026`, 'success');
       });
 
-      // Tab dropdown detail change
-      document.getElementById('select-detail-tab').addEventListener('change', async (e) => {
-        const val = e.target.value;
-        showToast(`Memuat data dari ${val}...`, 'info');
-        const items = await fetchDetailItems(val);
-        if (items.length > 0) {
-          currentDetailItems = items;
-          renderDetailTable();
-          showToast(`Berhasil memuat ${items.length} item.`, 'success');
-        } else {
-          showToast(`Data pada sheet "${val}" tidak ditemukan atau kosong.`, 'error');
-        }
-      });
-
       // Start fetching data
+      initFallbackData();
+      renderDashboard();
       fetchMainResume();
       loadAllDetailSheets();
     };
