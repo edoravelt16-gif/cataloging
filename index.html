@@ -525,15 +525,12 @@ export default function App() {
 
     return activeDetailSheet.headers.filter(h => {
       const s = h.toLowerCase().trim();
-      return s.includes('dat') || 
-             s.includes('eview') || 
-             s.includes('material') || 
-             s.includes('mtyp') || 
-             s.includes('corect') || 
-             s.includes('correct') ||
-             s.includes('action') ||
-             s.includes('case') ||
-             s.includes('status');
+      const isDate = s.includes('dat') || s.includes('eview') || s.includes('tanggal');
+      const isMaterial = s.includes('material');
+      const isMtyp = s.includes('mtyp');
+      const isCorrectiveAction = (s.includes('corect') || s.includes('correct') || s.includes('action') || s.includes('perbaikan')) && !s.includes('status') && !s.includes('case');
+      
+      return isDate || isMaterial || isMtyp || isCorrectiveAction;
     });
   }, [activeDetailSheet, showAllColumns]);
 
@@ -563,10 +560,21 @@ export default function App() {
     
     const matNumKey = headers.find(h => h.toLowerCase().includes('material number') || h.toLowerCase().includes('mat num'));
     const mtypKey = headers.find(h => h.toLowerCase().includes('mtyp'));
-    const actKey = headers.find(h => {
+    
+    // Utamakan kolom Corective Action murni (hindari terambil dari kolom Status / CLOSE)
+    let actKey = headers.find(h => {
       const s = h.toLowerCase();
-      return s.includes('corect') || s.includes('correct') || s.includes('action') || s.includes('status');
+      return (s.includes('corect') || s.includes('correct')) && !s.includes('status');
     });
+    if (!actKey) {
+      actKey = headers.find(h => {
+        const s = h.toLowerCase();
+        return s.includes('action') && !s.includes('status') && !s.includes('case');
+      });
+    }
+    if (!actKey) {
+      actKey = headers.find(h => h.toLowerCase().includes('status'));
+    }
 
     return items.map(item => {
       const dVal = (dateKey && item[dateKey]) ? item[dateKey] : item._rawDate || '-';
@@ -765,7 +773,7 @@ export default function App() {
               <th>Material</th>
               <th>Material Number</th>
               <th class="text-center">MTyp</th>
-              <th>Corective Action / Status</th>
+              <th>Corective Action</th>
             </tr>
           </thead>
           <tbody>
@@ -942,23 +950,6 @@ export default function App() {
               page-break-before: always;
               margin-top: 24px;
             }
-            .footer-sign {
-              margin-top: 26px;
-              padding-top: 14px;
-              border-top: 1px solid #e5e7eb;
-              display: grid;
-              grid-template-columns: repeat(3, 1fr);
-              gap: 20px;
-              text-align: center;
-              font-size: 9.5px;
-            }
-            .sign-box {
-              border-top: 1px dashed #9ca3af;
-              margin-top: 40px;
-              padding-top: 4px;
-              color: #4b5563;
-              font-weight: 600;
-            }
           </style>
         </head>
         <body>
@@ -990,21 +981,6 @@ export default function App() {
           ) : (
             renderInfoSection
           )}
-
-          <div class="footer-sign">
-            <div>
-              Dibuat Oleh:
-              <div class="sign-box">Staff Cataloging</div>
-            </div>
-            <div>
-              Diperiksa Oleh:
-              <div class="sign-box">Supervisor Logistic</div>
-            </div>
-            <div>
-              Disetujui Oleh:
-              <div class="sign-box">Manager Logistic</div>
-            </div>
-          </div>
 
           <script>
             window.onload = function() {
