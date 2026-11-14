@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>REPORT CATALOGING - KPI Information Completed</title>
+  <title>REPORT CATALOGING - Daily Validation & Information Completed</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -36,7 +36,7 @@
       background: #94a3b8;
     }
     .gauge-arc {
-      transition: stroke-dashoffset 1s ease-out, stroke 0.3s ease;
+      transition: stroke-dashoffset 0.8s ease-out, stroke 0.3s ease;
     }
   </style>
 </head>
@@ -44,7 +44,9 @@
 
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed top-5 right-5 z-50 transform transition-all duration-300 opacity-0 translate-y-[-20px] pointer-events-none bg-white border border-gray-200 shadow-xl rounded-lg px-4 py-3 flex items-center space-x-3 text-sm">
-    <div id="toast-icon"></div>
+    <div id="toast-icon" class="text-blue-600 flex items-center">
+      <i data-lucide="info" class="w-4 h-4"></i>
+    </div>
     <div id="toast-message" class="text-gray-700 font-medium"></div>
   </div>
 
@@ -53,33 +55,37 @@
     <!-- Brand -->
     <div class="p-4 border-b border-gray-200 flex items-center justify-between">
       <div class="flex items-center space-x-3 overflow-hidden" id="brand-logo-container">
-        <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white font-bold text-sm tracking-tight shadow-sm">
+        <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white font-bold text-sm tracking-tight shadow-sm shrink-0">
           DS
         </div>
-        <span class="font-bold text-gray-800 text-sm tracking-wide sidebar-label">LOOKER STUDIO</span>
+        <span class="font-bold text-gray-800 text-sm tracking-wide sidebar-label truncate">LOOKER STUDIO</span>
       </div>
-      <button id="btn-toggle-sidebar" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+      <button type="button" id="btn-toggle-sidebar" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" title="Toggle Sidebar">
         <i data-lucide="menu" class="w-5 h-5"></i>
       </button>
     </div>
 
     <!-- Nav Menus -->
     <div class="flex-1 overflow-y-auto py-4 px-3 space-y-6">
-      <!-- Section: Laporan Utama (Validation & Information Completed) -->
+      <!-- Section: Laporan Utama -->
       <div>
         <div class="px-2 mb-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider sidebar-label">
           Laporan Utama
         </div>
         
         <!-- Button KPI VALIDATION -->
-        <button id="btn-nav-val" onclick="switchReport('validation')" class="w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 border-l-4 border-blue-600 transition-all text-left">
-          <span id="nav-val-icon" class="text-blue-600 shrink-0 flex items-center"><i data-lucide="check-square" class="w-4 h-4"></i></span>
+        <button type="button" id="btn-nav-val" onclick="switchReport('validation')" class="w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 border-l-4 border-blue-600 transition-all text-left">
+          <span id="nav-val-icon" class="text-blue-600 shrink-0 flex items-center">
+            <i data-lucide="check-square" class="w-4 h-4"></i>
+          </span>
           <span class="ml-3 truncate sidebar-label">KPI VALIDATION</span>
         </button>
 
         <!-- Button KPI INFORMATION COMPLETED -->
-        <button id="btn-nav-info" onclick="switchReport('information')" class="w-full flex items-center px-3 py-2.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left">
-          <span id="nav-info-icon" class="text-gray-400 shrink-0 flex items-center"><i data-lucide="info" class="w-4 h-4"></i></span>
+        <button type="button" id="btn-nav-info" onclick="switchReport('information')" class="w-full flex items-center px-3 py-2.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left">
+          <span id="nav-info-icon" class="text-gray-400 shrink-0 flex items-center">
+            <i data-lucide="info" class="w-4 h-4"></i>
+          </span>
           <span class="ml-3 truncate sidebar-label">KPI INFORMATION COMPLETED</span>
         </button>
       </div>
@@ -92,8 +98,10 @@
         </div>
         
         <!-- Tombol PDF Gabungan (2 Laporan Jadi 1 PDF Lengkap) -->
-        <button id="btn-download-pdf" onclick="generateAndDownloadPDF('combined')" class="w-full flex items-center px-3 py-2.5 text-xs font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow transition-all text-left active:scale-[0.98]">
-          <i data-lucide="download" class="w-4 h-4 shrink-0"></i>
+        <button type="button" id="btn-download-pdf" onclick="generateAndDownloadPDF('combined')" class="w-full flex items-center px-3 py-2.5 text-xs font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow transition-all text-left active:scale-[0.98]">
+          <span class="shrink-0 flex items-center">
+            <i data-lucide="download" class="w-4 h-4"></i>
+          </span>
           <div class="ml-3 overflow-hidden sidebar-label">
             <div class="font-semibold truncate">Download PDF (Gabungan)</div>
             <div class="text-[10px] text-blue-100 truncate">Validation + Info Complete</div>
@@ -102,11 +110,11 @@
 
         <!-- Pilihan Unduh Satuan -->
         <div class="mt-2 space-y-1 sidebar-label">
-          <button onclick="generateAndDownloadPDF('validation')" class="w-full flex items-center justify-between px-2.5 py-1.5 text-[11px] text-gray-600 hover:text-blue-700 hover:bg-blue-50/70 rounded-md transition-colors text-left">
+          <button type="button" onclick="generateAndDownloadPDF('validation')" class="w-full flex items-center justify-between px-2.5 py-1.5 text-[11px] text-gray-600 hover:text-blue-700 hover:bg-blue-50/70 rounded-md transition-colors text-left">
             <span class="truncate">• PDF KPI Validation</span>
             <i data-lucide="download" class="w-3 h-3 text-gray-400 shrink-0"></i>
           </button>
-          <button onclick="generateAndDownloadPDF('information')" class="w-full flex items-center justify-between px-2.5 py-1.5 text-[11px] text-gray-600 hover:text-emerald-700 hover:bg-emerald-50/70 rounded-md transition-colors text-left">
+          <button type="button" onclick="generateAndDownloadPDF('information')" class="w-full flex items-center justify-between px-2.5 py-1.5 text-[11px] text-gray-600 hover:text-emerald-700 hover:bg-emerald-50/70 rounded-md transition-colors text-left">
             <span class="truncate">• PDF KPI Info Completed</span>
             <i data-lucide="download" class="w-3 h-3 text-gray-400 shrink-0"></i>
           </button>
@@ -146,14 +154,14 @@
   <div class="flex-1 flex flex-col h-full overflow-hidden">
     
     <!-- TOP HEADER BAR -->
-    <header class="h-14 bg-white border-b border-gray-200 px-6 flex items-center justify-between shrink-0 z-10">
+    <header class="h-14 bg-white border-b border-gray-200 px-6 flex items-center justify-between shrink-0 z-20">
       <div class="flex items-center space-x-3 overflow-hidden">
         <span class="text-xs font-bold text-gray-800 tracking-wide uppercase">KPI LOGISTIC REPORT</span>
         <span class="text-gray-300">|</span>
         <span class="text-xs text-gray-500 font-medium truncate hidden md:inline">
           Report Daily Validation dan Information Complete Cataloging
         </span>
-        <div id="sync-indicator" class="hidden items-center gap-1.5 text-[11px] text-blue-600 font-medium ml-2 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+        <div id="sync-indicator" class="hidden items-center gap-1.5 text-[11px] text-blue-600 font-medium ml-2 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
           <i data-lucide="refresh-cw" class="w-3 h-3 animate-spin"></i>
           <span>Memuat data...</span>
         </div>
@@ -161,25 +169,31 @@
 
       <!-- DATE PICKER DROPDOWN BUTTON -->
       <div class="relative">
-        <button id="btn-date-picker" class="flex items-center space-x-2 text-xs bg-white border border-gray-300 hover:border-gray-400 px-3 py-1.5 rounded shadow-sm text-gray-700 transition-colors">
+        <button type="button" id="btn-date-picker" class="flex items-center space-x-2 text-xs bg-white border border-gray-300 hover:border-gray-400 px-3 py-1.5 rounded-lg shadow-sm text-gray-700 transition-colors">
           <i data-lucide="calendar" class="w-3.5 h-3.5 text-gray-500"></i>
-          <span id="label-selected-date" class="font-medium">1 Nov 2026 - 1 Nov 2026</span>
+          <span id="label-selected-date" class="font-medium">Memuat tanggal...</span>
           <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400"></i>
         </button>
 
         <!-- Date Picker Card -->
-        <div id="date-picker-card" class="hidden absolute right-0 top-full mt-2 w-[460px] bg-white border border-gray-200 shadow-2xl rounded-xl p-5 z-50">
-          <div class="text-center mb-3">
-            <span class="bg-gray-100 border border-gray-200 px-3 py-1 text-xs font-medium rounded-full text-gray-600">
-              Pilih Rentang Tanggal Review (Nov 2026)
+        <div id="date-picker-card" class="hidden absolute right-0 top-full mt-2 w-[92vw] max-w-[460px] bg-white border border-gray-200 shadow-2xl rounded-xl p-5 z-50">
+          <div class="flex items-center justify-between mb-3">
+            <button type="button" onclick="changeCalendarMonth(-1, event)" class="p-1 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors" title="Bulan Sebelumnya">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <span id="temp-date-preview" class="bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-semibold rounded-full text-blue-700">
+              Rentang Dipilih: -
             </span>
+            <button type="button" onclick="changeCalendarMonth(1, event)" class="p-1 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors" title="Bulan Berikutnya">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
           </div>
 
-          <div class="grid grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <!-- Start Day -->
             <div>
               <div class="text-center text-xs font-semibold text-gray-500 mb-1">Tanggal Mulai</div>
-              <div class="text-center text-xs font-bold text-gray-800 mb-2">NOV 2026</div>
+              <div id="cal-start-month-label" class="text-center text-xs font-bold text-gray-800 mb-2">NOV 2026</div>
               <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-400 mb-1">
                 <div>M</div><div>S</div><div>S</div><div>R</div><div>K</div><div>J</div><div>S</div>
               </div>
@@ -189,7 +203,7 @@
             <!-- End Day -->
             <div>
               <div class="text-center text-xs font-semibold text-gray-500 mb-1">Tanggal Akhir</div>
-              <div class="text-center text-xs font-bold text-gray-800 mb-2">NOV 2026</div>
+              <div id="cal-end-month-label" class="text-center text-xs font-bold text-gray-800 mb-2">NOV 2026</div>
               <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-400 mb-1">
                 <div>M</div><div>S</div><div>S</div><div>R</div><div>K</div><div>J</div><div>S</div>
               </div>
@@ -197,17 +211,15 @@
             </div>
           </div>
 
-          <div class="flex items-center justify-between mt-5 pt-3 border-t border-gray-100">
-            <div class="flex gap-2">
-              <button onclick="setQuickDate(1, 1)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">1 Nov</button>
-              <button onclick="setQuickDate(2, 2)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">2 Nov</button>
-              <button onclick="setQuickDate(11, 11)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">11 Nov</button>
-              <button onclick="setQuickDate(1, 10)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">1 - 10 Nov</button>
-              <button onclick="setQuickDate(1, 30)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">1 Bulan</button>
+          <div class="flex flex-wrap items-center justify-between gap-2 mt-5 pt-3 border-t border-gray-100">
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" onclick="setTodayDate(event)" class="text-[11px] px-2.5 py-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded text-blue-700 font-semibold">Hari Ini</button>
+              <button type="button" onclick="setQuickDate(1, 15, event)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 font-medium">Tgl 1 - 15</button>
+              <button type="button" onclick="setQuickDate(1, getDaysInSelectedMonth(), event)" class="text-[11px] px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 font-medium">1 Bulan</button>
             </div>
-            <div class="flex gap-2">
-              <button id="btn-cancel-date" class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded">Batal</button>
-              <button id="btn-apply-date" class="px-4 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium rounded shadow-sm">Terapkan</button>
+            <div class="flex gap-2 ml-auto">
+              <button type="button" id="btn-cancel-date" class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
+              <button type="button" id="btn-apply-date" class="px-4 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm">Terapkan</button>
             </div>
           </div>
         </div>
@@ -280,7 +292,7 @@
             <h3 id="chart-title" class="text-gray-800 font-semibold text-sm">
               Daily Target vs Actual vs Achievement (KPI Validation)
             </h3>
-            <span class="text-xs text-gray-400">November 2026</span>
+            <span id="chart-month-label" class="text-xs text-gray-400">November 2026</span>
           </div>
           <div class="flex-1 w-full min-h-[260px] relative">
             <canvas id="dailyResumeChart"></canvas>
@@ -328,40 +340,37 @@
             </p>
           </div>
 
-          <!-- Indikator & Selector Sheet Terkunci Khusus per Laporan -->
+          <!-- Indikator Sheet Terkunci Otomatis Khusus per Laporan -->
           <div class="flex items-center gap-2">
-            <div id="detail-tab-container" class="relative flex items-center bg-blue-50/80 border border-blue-300 rounded-lg shadow-sm px-3 py-1.5 transition-all">
+            <div id="detail-tab-container" class="flex items-center bg-blue-50 border border-blue-300 rounded-lg shadow-sm px-3 py-1.5 transition-all select-none">
               <div id="detail-tab-icon" class="text-blue-600 flex items-center mr-2">
-                <i data-lucide="check-square" class="w-4 h-4"></i>
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
               </div>
-              <select id="select-detail-tab" onchange="handleDetailTabSelect(this.value)" class="text-xs font-semibold text-blue-900 bg-transparent rounded focus:outline-none cursor-pointer appearance-none pr-6">
-                <option value="1177910128" selected>Sheet: KPI VALIDATION</option>
-                <option value="1502479532">➔ Beralih ke Sheet: KPI COMPLETED INFORMATION</option>
-              </select>
-              <span id="detail-tab-lock-badge" class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-1 pointer-events-none">
+              <span id="detail-tab-name" class="text-xs font-semibold text-blue-900 mr-2">
+                Sheet: KPI VALIDATION
+              </span>
+              <span id="detail-tab-lock-badge" class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                 Terkunci
               </span>
-              <div class="pointer-events-none absolute right-2 text-blue-400">
-                <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
-              </div>
             </div>
           </div>
         </div>
 
         <div class="overflow-x-auto max-h-[460px] overflow-y-auto">
           <table class="w-full text-xs text-left text-gray-600">
-            <thead class="text-[11px] text-gray-700 uppercase bg-gray-100/90 sticky top-0 shadow-sm z-10 border-b border-gray-200">
+            <thead id="detail-table-head" class="text-[11px] text-gray-700 uppercase bg-gray-100/90 sticky top-0 shadow-sm z-10 border-b border-gray-200">
               <tr>
                 <th class="px-5 py-3 whitespace-nowrap font-semibold">Review Date</th>
                 <th class="px-5 py-3 whitespace-nowrap font-semibold">Material</th>
-                <th id="th-col-desc" class="px-5 py-3 whitespace-nowrap font-semibold">Material Number</th>
-                <th id="th-col-mtyp" class="px-5 py-3 whitespace-nowrap font-semibold text-center">MTyp</th>
+                <th class="px-5 py-3 whitespace-nowrap font-semibold">Material Desc</th>
+                <th class="px-5 py-3 whitespace-nowrap font-semibold">Keterangan</th>
+                <th class="px-5 py-3 whitespace-nowrap font-semibold text-center">CCP HASIL</th>
                 <th class="px-5 py-3 whitespace-nowrap font-semibold">Corective Action</th>
               </tr>
             </thead>
             <tbody id="detail-table-body">
               <tr>
-                <td colspan="5" class="px-6 py-8 text-center text-gray-400">Memuat data item detail...</td>
+                <td colspan="6" class="px-6 py-8 text-center text-gray-400">Memuat data item detail...</td>
               </tr>
             </tbody>
           </table>
@@ -379,23 +388,86 @@
     const VALIDATION_GID = '1177910128';
     const INFO_GID = '1502479532';
 
+    const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const MONTH_NAMES_FULL = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    // Deteksi otomatis tanggal hari ini saat link/laporan dibuka
+    const TODAY_DATE = new Date();
+
     // APPLICATION STATE
     let activeReport = 'validation'; // 'validation' | 'information'
-    let startDay = 1;
-    let endDay = 1;
-    let tempStart = 1;
-    let tempEnd = 1;
+    let selectedMonth = TODAY_DATE.getMonth() + 1;
+    let selectedYear = TODAY_DATE.getFullYear();
+    let startDay = TODAY_DATE.getDate();
+    let endDay = TODAY_DATE.getDate();
+
+    let tempMonth = selectedMonth;
+    let tempYear = selectedYear;
+    let tempStart = startDay;
+    let tempEnd = endDay;
     let isSidebarOpen = true;
 
     let resumeData = [];
     let detailValItems = [];
     let detailInfoItems = [];
-    let currentDetailItems = [];
     let chartInstance = null;
+
+    function getDaysInMonth(month, year) {
+      return new Date(year, month, 0).getDate();
+    }
+
+    function getDaysInSelectedMonth() {
+      return getDaysInMonth(tempMonth, tempYear);
+    }
+
+    function formatMonthShort(month) {
+      return MONTH_NAMES_SHORT[month - 1] || 'Nov';
+    }
+
+    function formatMonthFull(month) {
+      return MONTH_NAMES_FULL[month - 1] || 'November';
+    }
+
+    // Toast Notification
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const msgEl = document.getElementById('toast-message');
+      const iconEl = document.getElementById('toast-icon');
+      if (!toast || !msgEl) return;
+
+      msgEl.innerText = message;
+      if (iconEl) {
+        iconEl.className = type === 'success'
+          ? 'text-emerald-600 flex items-center'
+          : type === 'warning'
+            ? 'text-amber-600 flex items-center'
+            : 'text-blue-600 flex items-center';
+      }
+
+      toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 3200);
+    }
+
+    // HTML Sanitizer for safe table rendering & PDF export
+    function escapeHtml(unsafe) {
+      if (unsafe === null || unsafe === undefined) return '-';
+      return String(unsafe)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
     // Helper parser angka & persentase
     function parseNum(val, isAch = false) {
-      if (!val || val === '-' || val === '') return 0;
+      if (val === null || val === undefined || val === '-' || val === '') return 0;
       let v = val.toString().trim().toLowerCase();
       let hasPercent = v.includes('%');
       v = v.replace(/%/g, '');
@@ -449,7 +521,7 @@
       return null;
     }
 
-    // Helper pemisah CSV dengan aman terhadap tanda petik
+    // Helper pemisah CSV dengan aman terhadap tanda petik ganda
     function splitCSVLine(str) {
       return str.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => {
         let clean = s.trim();
@@ -460,16 +532,18 @@
       });
     }
 
-    // Inisialisasi data cadangan (fallback) November 2026 agar visual langsung tampil jika offline/CORS
+    // Inisialisasi data cadangan sesuai bulan & tahun aktif agar dashboard selalu siap tampil
     function initFallbackData() {
+      const totalDays = getDaysInMonth(selectedMonth, selectedYear);
+      const monthPad = String(selectedMonth).padStart(2, '0');
       const fallbackResume = [];
-      for (let day = 1; day <= 30; day++) {
-        const dStr = `${String(day).padStart(2, '0')}/11/2026`;
+      for (let day = 1; day <= totalDays; day++) {
+        const dStr = `${String(day).padStart(2, '0')}/${monthPad}/${selectedYear}`;
         fallbackResume.push({
           rawDate: dStr,
           day: day,
-          month: 11,
-          year: 2026,
+          month: selectedMonth,
+          year: selectedYear,
           valPlan: 25,
           valActual: 25,
           valAchievement: 100,
@@ -480,544 +554,667 @@
       }
       resumeData = fallbackResume;
 
-      const baseVal = [
-        { code: '1000039001', name: 'TEE  KOMATSU', mtyp: 'Format Salah', action: 'PERBAIKAN DESKRIPSI' },
-        { code: '1000039000', name: 'BRACKET  KOMATSU', mtyp: 'Format Salah', action: 'PERBAIKAN DESKRIPSI' },
-        { code: '1000038999', name: 'BLOCK  KOMATSU', mtyp: 'Format Salah', action: 'PERBAIKAN DESKRIPSI' },
-        { code: '1000038998', name: 'RECEIVER ASSY  KOMATSU', mtyp: 'Format Salah', action: 'PERBAIKAN DESKRIPSI' },
-        { code: '1000038997', name: 'HOSE ASSY  KOMATSU', mtyp: 'Format Salah', action: 'PERBAIKAN DESKRIPSI' }
+      const baseSamples = [
+        { code: '4000002929', name: 'EXHAUST FAN PANASONIC', ket: 'CONS', ccp: 'PC', comp: 'FAN / BLOWER', brand: 'PANASONIC', model: 'FV-25RUN', mpn: '8 INCH X 250 MM', action: 'PERBAIKAN DESKRIPSI' },
+        { code: '1000039001', name: 'TEE KOMATSU', ket: 'CONS', ccp: 'PC', comp: 'HYDRAULIC FITTING', brand: 'KOMATSU', model: 'PC200-8', mpn: 'PN-39001-KMT', action: 'PERBAIKAN DESKRIPSI' },
+        { code: '1000039000', name: 'BRACKET KOMATSU', ket: 'CONS', ccp: 'PC', comp: 'CHASSIS / MOUNTING', brand: 'KOMATSU', model: 'HD785-7', mpn: 'PN-39000-KMT', action: 'PERBAIKAN DESKRIPSI' },
+        { code: '1000038999', name: 'BLOCK KOMATSU', ket: 'CONS', ccp: 'PC', comp: 'ENGINE / VALVE', brand: 'KOMATSU', model: 'D375A-6', mpn: 'PN-38999-KMT', action: 'PERBAIKAN DESKRIPSI' },
+        { code: '1000038998', name: 'RECEIVER ASSY KOMATSU', ket: 'CONS', ccp: 'PC', comp: 'AIR CONDITIONING', brand: 'KOMATSU', model: 'PC300-8', mpn: 'PN-38998-KMT', action: 'PERBAIKAN DESKRIPSI' }
       ];
 
       const valItems = [];
       const infoItems = [];
-      for (let d = 1; d <= 30; d++) {
-        const dStr = `${String(d).padStart(2, '0')}/11/2026`;
+      for (let d = 1; d <= totalDays; d++) {
+        const dStr = `${String(d).padStart(2, '0')}/${monthPad}/${selectedYear}`;
         for (let i = 0; i < 25; i++) {
-          const sample = baseVal[i % baseVal.length];
+          const sample = baseSamples[i % baseSamples.length];
           const itemNum = (parseInt(sample.code, 10) - (d * 50) - i).toString();
-          valItems.push({
+          const rowObj = {
             date: dStr,
             day: d,
-            month: 11,
-            year: 2026,
+            month: selectedMonth,
+            year: selectedYear,
             material: itemNum,
+            materialDesc: sample.name,
             materialNumber: sample.name,
-            mtyp: sample.mtyp,
+            keterangan: sample.ket,
+            ccp: sample.ccp,
+            component: sample.comp,
+            brand: sample.brand,
+            model: sample.model,
+            mpn: sample.mpn,
+            mtyp: sample.mpn,
             action: sample.action
-          });
-          infoItems.push({
-            date: dStr,
-            day: d,
-            month: 11,
-            year: 2026,
-            material: itemNum,
-            materialNumber: sample.name,
-            mtyp: sample.mtyp,
-            action: sample.action
-          });
+          };
+          valItems.push({ ...rowObj });
+          infoItems.push({ ...rowObj });
         }
       }
       detailValItems = valItems;
       detailInfoItems = infoItems;
-      currentDetailItems = activeReport === 'validation' ? detailValItems : detailInfoItems;
     }
 
-    // Fungsi penarik data ringkasan KPI (Target & Actual Harian)
-    async function fetchMainResume() {
-      const syncEl = document.getElementById('sync-indicator');
-      if (syncEl) {
-        syncEl.classList.remove('hidden');
-        syncEl.classList.add('flex');
+    // Parser CSV Ringkasan Target & Actual Harian
+    function parseResumeCSV(csvText) {
+      const lines = csvText.split('\n').filter(l => l.trim() !== '');
+      if (lines.length < 2) return [];
+      const matrix = lines.map(splitCSVLine);
+
+      let headerIdx = 0;
+      for (let i = 0; i < Math.min(10, matrix.length); i++) {
+        const rowStr = matrix[i].join(' ').toLowerCase();
+        if (rowStr.includes('plan') && rowStr.includes('actual') && (rowStr.includes('validation') || rowStr.includes('information'))) {
+          headerIdx = i;
+          break;
+        }
       }
 
-      try {
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${MAIN_RESUME_GID}`;
-        const res = await fetch(url);
-        const text = await res.text();
-        if (text.includes('<html') || text.trim().length < 30) throw new Error('Data sheet resume tidak valid');
+      const headers = (matrix[headerIdx] || []).map(h => h.toLowerCase());
+      const findCol = (kws) => headers.findIndex(h => kws.every(kw => h.includes(kw)));
 
-        const lines = text.split('\n').filter(l => l.trim() !== '');
-        const matrix = lines.map(splitCSVLine);
+      let dateIdx = findCol(['date']);
+      if (dateIdx === -1) dateIdx = findCol(['tanggal']);
+      if (dateIdx === -1) dateIdx = findCol(['review']);
 
-        let targetRowIdx = 0;
-        for (let i = 0; i < Math.min(10, matrix.length); i++) {
-          const rowStr = matrix[i].join(' ').toLowerCase();
-          if (rowStr.includes('plan') && rowStr.includes('actual') && (rowStr.includes('information') || rowStr.includes('validation'))) {
-            targetRowIdx = i;
-            break;
-          }
+      const valPlanIdx = findCol(['plan', 'validation']);
+      const valActIdx = findCol(['actual', 'validation']);
+      const valAchIdx = findCol(['achievement', 'validation']);
+
+      const infoPlanIdx = findCol(['plan', 'information']);
+      const infoActIdx = findCol(['actual', 'information']);
+      const infoAchIdx = findCol(['achievement', 'information']);
+
+      const result = [];
+      for (let i = headerIdx + 1; i < matrix.length; i++) {
+        const row = matrix[i];
+        if (!row || row.length < 3) continue;
+
+        const rawDate = dateIdx !== -1 && row[dateIdx] ? row[dateIdx].trim() : '';
+        const dmy = parseDateToDMY(rawDate);
+        if (!dmy) continue;
+
+        const vPlan = valPlanIdx !== -1 ? parseNum(row[valPlanIdx]) : 0;
+        const vAct = valActIdx !== -1 ? parseNum(row[valActIdx]) : 0;
+        let vAch = valAchIdx !== -1 ? parseNum(row[valAchIdx], true) : 0;
+        if (vAch === 0 && vPlan > 0 && vAct > 0) {
+          vAch = Number(((vAct / vPlan) * 100).toFixed(1));
         }
 
-        const headers = matrix[targetRowIdx] ? matrix[targetRowIdx].map(h => h.replace(/["']/g, '').trim().toLowerCase()) : [];
-        const findCol = (keywords) => headers.findIndex(h => keywords.every(kw => h.includes(kw)));
+        const iPlan = infoPlanIdx !== -1 ? parseNum(row[infoPlanIdx]) : 0;
+        const iAct = infoActIdx !== -1 ? parseNum(row[infoActIdx]) : 0;
+        let iAch = infoAchIdx !== -1 ? parseNum(row[infoAchIdx], true) : 0;
+        if (iAch === 0 && iPlan > 0 && iAct > 0) {
+          iAch = Number(((iAct / iPlan) * 100).toFixed(1));
+        }
 
-        let idxDate = findCol(['date']);
-        if (idxDate === -1) idxDate = findCol(['tanggal']);
-        if (idxDate === -1) idxDate = findCol(['review']);
-
-        const idxPlanInfo = findCol(['plan', 'information']);
-        const idxActInfo = findCol(['actual', 'information']);
-        const idxAchInfo = findCol(['achievement', 'information']);
-
-        const idxPlanVal = findCol(['plan', 'validation']);
-        const idxActVal = findCol(['actual', 'validation']);
-        const idxAchVal = findCol(['achievement', 'validation']);
-
-        const parsed = [];
-        for (let i = targetRowIdx + 1; i < matrix.length; i++) {
-          const row = matrix[i];
-          if (!row || row.length < 3) continue;
-
-          const dateStr = idxDate !== -1 && row[idxDate] ? row[idxDate].trim() : '';
-          const dmy = parseDateToDMY(dateStr);
-          if (!dmy) continue;
-
-          const planVal = idxPlanVal !== -1 ? parseNum(row[idxPlanVal]) : 0;
-          const actVal = idxActVal !== -1 ? parseNum(row[idxActVal]) : 0;
-          let achVal = idxAchVal !== -1 && row[idxAchVal] ? parseNum(row[idxAchVal], true) : 0;
-          if (achVal === 0 && planVal > 0 && actVal > 0) {
-            achVal = Number(((actVal / planVal) * 100).toFixed(1));
-          }
-
-          const planInfo = idxPlanInfo !== -1 ? parseNum(row[idxPlanInfo]) : 0;
-          const actInfo = idxActInfo !== -1 ? parseNum(row[idxActInfo]) : 0;
-          let achInfo = idxAchInfo !== -1 && row[idxAchInfo] ? parseNum(row[idxAchInfo], true) : 0;
-          if (achInfo === 0 && planInfo > 0 && actInfo > 0) {
-            achInfo = Number(((actInfo / planInfo) * 100).toFixed(1));
-          }
-
-          parsed.push({
-            rawDate: dateStr,
+        if (vPlan > 0 || iPlan > 0 || vAct > 0 || iAct > 0) {
+          result.push({
+            rawDate: rawDate,
             day: dmy.day,
             month: dmy.month,
             year: dmy.year,
-            valPlan: planVal,
-            valActual: actVal,
-            valAchievement: achVal,
-            infoPlan: planInfo,
-            infoActual: actInfo,
-            infoAchievement: achInfo
+            valPlan: vPlan,
+            valActual: vAct,
+            valAchievement: vAch,
+            infoPlan: iPlan,
+            infoActual: iAct,
+            infoAchievement: iAch
           });
         }
+      }
+      return result;
+    }
 
-        if (parsed.length > 0) {
-          resumeData = parsed;
+    // Parser CSV Detail Item Record per Sheet
+    function parseDetailMatrix(csvText) {
+      const lines = csvText.split('\n').filter(l => l.trim() !== '');
+      if (lines.length < 2) return [];
+      const matrix = lines.map(splitCSVLine);
+
+      let headerIdx = 0;
+      for (let i = 0; i < Math.min(8, matrix.length); i++) {
+        const joined = matrix[i].map(c => c.toLowerCase()).join(' ');
+        if (joined.includes('material') || joined.includes('corect') || joined.includes('correct') || joined.includes('dat') || joined.includes('eview')) {
+          headerIdx = i;
+          break;
         }
+      }
+
+      const headers = (matrix[headerIdx] || []).map(h => h.replace(/["']/g, '').replace(/\s+/g, ' ').trim());
+      const hLow = headers.map(h => h.toLowerCase());
+
+      let dateIdx = hLow.findIndex(h => h.includes('dat') || h.includes('eview') || h.includes('tanggal'));
+      if (dateIdx === -1 && matrix.length > headerIdx + 1) {
+        dateIdx = matrix[headerIdx + 1].findIndex(val => parseDateToDMY(val) !== null);
+      }
+
+      const matIdx = hLow.findIndex(h => h === 'material' || h === 'material ' || (h.includes('material') && !h.includes('number') && !h.includes('desc') && !h.includes('group') && !h.includes('grp')));
+      const matDescIdx = hLow.findIndex(h => h.includes('material desc') || h.includes('desc') || h.includes('material number') || h.includes('mat num'));
+      const ketIdx = hLow.findIndex(h => h.includes('keterangan') || h === 'ket' || h.includes('remark') || h.includes('note'));
+      
+      let ccpIdx = hLow.findIndex(h => h.includes('ccp hasil') || (h.includes('ccp') && h.includes('hasil')));
+      if (ccpIdx === -1) {
+        ccpIdx = hLow.findIndex(h => h === 'ccp' || h.includes('ccp'));
+      }
+
+      const compIdx = hLow.findIndex(h => h === 'component' || (h.includes('component') && !h.includes('status')) || h.includes('komponen'));
+      const brandIdx = hLow.findIndex(h => h === 'brand' || ((h.includes('brand') || h.includes('merk') || h.includes('merek')) && !h.includes('status')));
+      const modelIdx = hLow.findIndex(h => h === 'model' || ((h.includes('model') || h.includes('tipe')) && !h.includes('status')));
+      const mpnIdx = hLow.findIndex(h => h === 'mpn' || h.includes('mpn') || h.includes('mtyp'));
+
+      // Prioritas ketat kolom Corective Action agar tidak tertukar dengan kolom Status ('CLOSE')
+      let actIdx = hLow.findIndex(h => (h.includes('corect') || h.includes('correct')) && !h.includes('status'));
+      if (actIdx === -1) {
+        actIdx = hLow.findIndex(h => h.includes('action') && !h.includes('status') && !h.includes('case'));
+      }
+      if (actIdx === -1) {
+        actIdx = hLow.findIndex(h => h.includes('perbaikan'));
+      }
+
+      const items = [];
+      for (let i = headerIdx + 1; i < matrix.length; i++) {
+        const row = matrix[i];
+        if (!row || row.length === 0 || row.every(c => c === '')) continue;
+
+        const cleanCell = (idx) => {
+          if (idx === -1 || row[idx] === undefined) return '-';
+          const v = String(row[idx]).replace(/^["']+|["']+$/g, '').trim();
+          return v || '-';
+        };
+
+        const dateVal = cleanCell(dateIdx);
+        const dmy = parseDateToDMY(dateVal);
+        const descVal = cleanCell(matDescIdx);
+        const ketVal = cleanCell(ketIdx);
+        const ccpVal = cleanCell(ccpIdx);
+        const compVal = cleanCell(compIdx);
+        const brandVal = cleanCell(brandIdx);
+        const modelVal = cleanCell(modelIdx);
+        const mpnVal = cleanCell(mpnIdx);
+        const actionVal = cleanCell(actIdx);
+
+        items.push({
+          date: dateVal || '-',
+          day: dmy ? dmy.day : 0,
+          month: dmy ? dmy.month : 0,
+          year: dmy ? dmy.year : 0,
+          material: cleanCell(matIdx),
+          materialNumber: descVal,
+          materialDesc: descVal,
+          keterangan: ketVal,
+          ccp: ccpVal,
+          component: compVal,
+          brand: brandVal,
+          model: modelVal,
+          mtyp: mpnVal,
+          mpn: mpnVal,
+          action: actionVal || '-'
+        });
+      }
+      return items;
+    }
+
+    // Fetch CSV dari Google Sheets berdasarkan GID atau Nama Sheet
+    async function fetchSheetCSV(gid, sheetNameFallback = null) {
+      const urls = [];
+      if (gid) {
+        urls.push(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`);
+      }
+      if (sheetNameFallback) {
+        urls.push(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetNameFallback)}`);
+      }
+
+      for (const url of urls) {
+        try {
+          const resp = await fetch(url);
+          if (resp.ok) {
+            const text = await resp.text();
+            if (!text.includes('<html') && text.trim().length > 20) {
+              return text;
+            }
+          }
+        } catch (err) {
+          console.warn('Gagal mengambil URL sheet:', url, err);
+        }
+      }
+      return null;
+    }
+
+    // Sinkronisasi seluruh sheet utama & detail
+    async function fetchAllSheets() {
+      const syncInd = document.getElementById('sync-indicator');
+      if (syncInd) {
+        syncInd.classList.remove('hidden');
+        syncInd.classList.add('flex');
+      }
+
+      try {
+        // 1. Resume Harian
+        const resText = await fetchSheetCSV(MAIN_RESUME_GID);
+        if (resText) {
+          const parsedRes = parseResumeCSV(resText);
+          if (parsedRes.length > 0) {
+            resumeData = parsedRes;
+          }
+        }
+
+        // 2. Detail KPI VALIDATION
+        const valText = await fetchSheetCSV(VALIDATION_GID, 'KPI VALIDATION');
+        if (valText) {
+          const parsedVal = parseDetailMatrix(valText);
+          if (parsedVal.length > 0) {
+            detailValItems = parsedVal;
+          }
+        }
+
+        // 3. Detail KPI COMPLETED INFORMATION
+        let infoText = await fetchSheetCSV(INFO_GID, 'KPI COMPLETED INFORMATION');
+        if (!infoText) {
+          infoText = await fetchSheetCSV(null, 'KPI INFORMATION COMPLETED');
+        }
+        if (infoText) {
+          const parsedInfo = parseDetailMatrix(infoText);
+          if (parsedInfo.length > 0) {
+            detailInfoItems = parsedInfo;
+          }
+        }
+
+        renderAll();
       } catch (err) {
-        console.warn('Menggunakan data resume cadangan:', err);
+        console.warn('Menggunakan data lokal cadangan:', err);
       } finally {
-        if (syncEl) {
-          syncEl.classList.add('hidden');
-          syncEl.classList.remove('flex');
+        if (syncInd) {
+          syncInd.classList.add('hidden');
+          syncInd.classList.remove('flex');
         }
-        renderDashboard();
       }
     }
 
-    // Toast helper
-    function showToast(message, type = 'info') {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toast-message');
-      const toastIcon = document.getElementById('toast-icon');
+    // Perpindahan Laporan Utama & Penguncian Sumber Detail Sheet
+    function switchReport(reportType) {
+      activeReport = reportType;
+      const isVal = reportType === 'validation';
 
-      toastMsg.innerText = message;
-      if (type === 'success') {
-        toastIcon.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>`;
-      } else if (type === 'error') {
-        toastIcon.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 text-red-500"></i>`;
-      } else {
-        toastIcon.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-blue-500"></i>`;
-      }
-      lucide.createIcons();
-
-      toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
-      }, 3500);
-    }
-
-    // Switch between KPI VALIDATION & KPI INFORMATION COMPLETED
-    function switchReport(type) {
-      activeReport = type;
       const btnVal = document.getElementById('btn-nav-val');
       const btnInfo = document.getElementById('btn-nav-info');
       const navValIcon = document.getElementById('nav-val-icon');
       const navInfoIcon = document.getElementById('nav-info-icon');
+
+      if (btnVal && btnInfo) {
+        if (isVal) {
+          btnVal.className = 'w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 border-l-4 border-blue-600 transition-all text-left';
+          if (navValIcon) navValIcon.className = 'text-blue-600 shrink-0 flex items-center';
+
+          btnInfo.className = 'w-full flex items-center px-3 py-2.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left';
+          if (navInfoIcon) navInfoIcon.className = 'text-gray-400 shrink-0 flex items-center';
+        } else {
+          btnInfo.className = 'w-full flex items-center px-3 py-2.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 border-l-4 border-emerald-600 transition-all text-left';
+          if (navInfoIcon) navInfoIcon.className = 'text-emerald-600 shrink-0 flex items-center';
+
+          btnVal.className = 'w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left';
+          if (navValIcon) navValIcon.className = 'text-gray-400 shrink-0 flex items-center';
+        }
+      }
+
+      // Banner Utama
       const banner = document.getElementById('kpi-main-banner');
       const bannerTitle = document.getElementById('banner-title');
+      if (banner && bannerTitle) {
+        banner.className = isVal
+          ? 'bg-blue-600 text-white p-3.5 rounded-lg shadow-sm text-center font-bold tracking-wider uppercase text-base shadow-blue-500/10 flex items-center justify-center space-x-2 transition-colors duration-300'
+          : 'bg-emerald-600 text-white p-3.5 rounded-lg shadow-sm text-center font-bold tracking-wider uppercase text-base shadow-emerald-500/10 flex items-center justify-center space-x-2 transition-colors duration-300';
+        bannerTitle.innerText = isVal ? 'KPI VALIDATION PERFORMANCE' : 'KPI INFORMATION COMPLETED PERFORMANCE';
+      }
+
+      // Gauge & Actual Box Styling
       const gaugeTitle = document.getElementById('gauge-title');
-      const chartTitle = document.getElementById('chart-title');
-      const resumeTitle = document.getElementById('resume-table-title');
-      const detailTitle = document.getElementById('detail-sheet-title');
       const statActualBox = document.getElementById('stat-actual-box');
       const statActualLabel = document.getElementById('stat-actual-label');
-      const statActualVal = document.getElementById('stat-total-actual');
-      const thColDesc = document.getElementById('th-col-desc');
-      const thColMtyp = document.getElementById('th-col-mtyp');
+      const statTotalActual = document.getElementById('stat-total-actual');
 
-      if (type === 'validation') {
-        if (btnVal) btnVal.className = "w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 border-l-4 border-blue-600 transition-all text-left";
-        if (btnInfo) btnInfo.className = "w-full flex items-center px-3 py-2.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left";
-        if (navValIcon) navValIcon.className = "text-blue-600 shrink-0 flex items-center";
-        if (navInfoIcon) navInfoIcon.className = "text-gray-400 shrink-0 flex items-center";
-
-        if (banner) banner.className = "bg-blue-600 text-white p-3.5 rounded-lg shadow-sm text-center font-bold tracking-wider uppercase text-base shadow-blue-500/10 flex items-center justify-center space-x-2 transition-colors duration-300";
-        if (bannerTitle) bannerTitle.innerText = "KPI VALIDATION PERFORMANCE";
-        if (gaugeTitle) gaugeTitle.innerText = "OVERALL VALIDATION ACHIEVEMENT";
-        if (chartTitle) chartTitle.innerText = "Daily Target vs Actual vs Achievement (KPI Validation)";
-        if (resumeTitle) resumeTitle.innerText = "Resume Data Sheet (Target & Actual Harian - Validation)";
-        if (detailTitle) detailTitle.innerText = "Detail Item Record (KPI Validation)";
-        if (thColDesc) thColDesc.innerText = "Material Number";
-        if (thColMtyp) thColMtyp.innerText = "MTyp";
-
-        if (statActualBox) statActualBox.className = "bg-blue-50/50 p-2.5 rounded-md border border-blue-100";
-        if (statActualLabel) statActualLabel.className = "text-[10px] text-blue-600 uppercase font-semibold";
-        if (statActualVal) statActualVal.className = "text-base font-bold text-blue-700";
-
-        currentDetailItems = detailValItems;
-      } else {
-        if (btnInfo) btnInfo.className = "w-full flex items-center px-3 py-2.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 border-l-4 border-emerald-600 transition-all text-left";
-        if (btnVal) btnVal.className = "w-full flex items-center px-3 py-2.5 mb-1.5 text-xs font-medium rounded-lg text-gray-600 hover:bg-gray-100 transition-all text-left";
-        if (navInfoIcon) navInfoIcon.className = "text-emerald-600 shrink-0 flex items-center";
-        if (navValIcon) navValIcon.className = "text-gray-400 shrink-0 flex items-center";
-
-        if (banner) banner.className = "bg-emerald-600 text-white p-3.5 rounded-lg shadow-sm text-center font-bold tracking-wider uppercase text-base shadow-emerald-500/10 flex items-center justify-center space-x-2 transition-colors duration-300";
-        if (bannerTitle) bannerTitle.innerText = "KPI INFORMATION COMPLETED PERFORMANCE";
-        if (gaugeTitle) gaugeTitle.innerText = "OVERALL INFORMATION COMPLETED ACHIEVEMENT";
-        if (chartTitle) chartTitle.innerText = "Daily Target vs Actual vs Achievement (KPI Information Completed)";
-        if (resumeTitle) resumeTitle.innerText = "Resume Data Sheet (Target & Actual Harian - Information Completed)";
-        if (detailTitle) detailTitle.innerText = "Detail Item Record (KPI Information Completed)";
-        if (thColDesc) thColDesc.innerText = "Material Desc";
-        if (thColMtyp) thColMtyp.innerText = "MPN";
-
-        if (statActualBox) statActualBox.className = "bg-emerald-50/50 p-2.5 rounded-md border border-emerald-100";
-        if (statActualLabel) statActualLabel.className = "text-[10px] text-emerald-600 uppercase font-semibold";
-        if (statActualVal) statActualVal.className = "text-base font-bold text-emerald-700";
-
-        currentDetailItems = detailInfoItems;
+      if (gaugeTitle) {
+        gaugeTitle.innerText = isVal ? 'OVERALL VALIDATION ACHIEVEMENT' : 'OVERALL INFORMATION COMPLETED ACHIEVEMENT';
+      }
+      if (statActualBox && statActualLabel && statTotalActual) {
+        statActualBox.className = isVal
+          ? 'bg-blue-50/50 p-2.5 rounded-md border border-blue-100'
+          : 'bg-emerald-50/50 p-2.5 rounded-md border border-emerald-100';
+        statActualLabel.className = isVal
+          ? 'text-[10px] text-blue-600 uppercase font-semibold'
+          : 'text-[10px] text-emerald-600 uppercase font-semibold';
+        statTotalActual.className = isVal
+          ? 'text-base font-bold text-blue-700'
+          : 'text-base font-bold text-emerald-700';
       }
 
-      updateDetailSelectorUI(type);
-      renderDashboard();
-    }
-
-    // Memperbarui tampilan dan opsi dropdown sheet secara dinamis
-    function updateDetailSelectorUI(type) {
-      const container = document.getElementById('detail-tab-container');
-      const icon = document.getElementById('detail-tab-icon');
-      const selectTab = document.getElementById('select-detail-tab');
-      const lockBadge = document.getElementById('detail-tab-lock-badge');
-
-      if (!container || !selectTab) return;
-
-      if (type === 'validation') {
-        container.className = "relative flex items-center bg-blue-50/80 border border-blue-300 rounded-lg shadow-sm px-3 py-1.5 transition-all";
-        icon.className = "text-blue-600 flex items-center mr-2";
-        icon.innerHTML = `<i data-lucide="check-square" class="w-4 h-4 text-blue-600"></i>`;
-        lockBadge.className = "bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-1 pointer-events-none";
-        lockBadge.innerText = "Terkunci";
-        selectTab.className = "text-xs font-semibold text-blue-900 bg-transparent rounded focus:outline-none cursor-pointer appearance-none pr-6";
-        
-        selectTab.innerHTML = `
-          <option value="${VALIDATION_GID}" selected>Sheet: KPI VALIDATION</option>
-          <option value="${INFO_GID}">➔ Beralih ke Sheet: KPI COMPLETED INFORMATION</option>
-        `;
-      } else {
-        container.className = "relative flex items-center bg-emerald-50/80 border border-emerald-300 rounded-lg shadow-sm px-3 py-1.5 transition-all";
-        icon.className = "text-emerald-600 flex items-center mr-2";
-        icon.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-emerald-600"></i>`;
-        lockBadge.className = "bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-1 pointer-events-none";
-        lockBadge.innerText = "Terkunci";
-        selectTab.className = "text-xs font-semibold text-emerald-900 bg-transparent rounded focus:outline-none cursor-pointer appearance-none pr-6";
-        
-        selectTab.innerHTML = `
-          <option value="${INFO_GID}" selected>Sheet: KPI COMPLETED INFORMATION</option>
-          <option value="${VALIDATION_GID}">➔ Beralih ke Sheet: KPI VALIDATION</option>
-        `;
+      // Chart & Resume Titles
+      const chartTitle = document.getElementById('chart-title');
+      const resumeTitle = document.getElementById('resume-table-title');
+      if (chartTitle) {
+        chartTitle.innerText = isVal
+          ? 'Daily Target vs Actual vs Achievement (KPI Validation)'
+          : 'Daily Target vs Actual vs Achievement (KPI Information Completed)';
       }
-      lucide.createIcons();
-    }
-
-    // Handler jika pengguna memilih tab lewat dropdown
-    function handleDetailTabSelect(val) {
-      if (val === VALIDATION_GID && activeReport !== 'validation') {
-        switchReport('validation');
-        showToast('Beralih ke Laporan & Sheet KPI VALIDATION', 'info');
-      } else if (val === INFO_GID && activeReport !== 'information') {
-        switchReport('information');
-        showToast('Beralih ke Laporan & Sheet KPI COMPLETED INFORMATION', 'info');
+      if (resumeTitle) {
+        resumeTitle.innerText = isVal
+          ? 'Resume Data Sheet (Target & Actual Harian - Validation)'
+          : 'Resume Data Sheet (Target & Actual Harian - Information Completed)';
       }
-    }
 
-    // FETCH DETAIL ITEMS FROM GID OR TAB NAME
-    async function fetchDetailItems(target) {
-      try {
-        let fetchUrl = '';
-        if (/^\d+$/.test(target)) {
-          fetchUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${target}`;
+      // Penguncian Badge Sheet Detail Item Record
+      const detailSheetTitle = document.getElementById('detail-sheet-title');
+      const detailTabContainer = document.getElementById('detail-tab-container');
+      const detailTabIcon = document.getElementById('detail-tab-icon');
+      const detailTabName = document.getElementById('detail-tab-name');
+      const detailTabLockBadge = document.getElementById('detail-tab-lock-badge');
+
+      if (detailSheetTitle) {
+        detailSheetTitle.innerText = isVal
+          ? 'Detail Item Record (KPI Validation)'
+          : 'Detail Item Record (KPI Information Completed)';
+      }
+      if (detailTabContainer && detailTabIcon && detailTabName && detailTabLockBadge) {
+        if (isVal) {
+          detailTabContainer.className = 'flex items-center bg-blue-50 border border-blue-300 rounded-lg shadow-sm px-3 py-1.5 transition-all select-none';
+          detailTabIcon.className = 'text-blue-600 flex items-center mr-2';
+          detailTabName.className = 'text-xs font-semibold text-blue-900 mr-2';
+          detailTabName.innerText = 'Sheet: KPI VALIDATION';
+          detailTabLockBadge.className = 'bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full';
         } else {
-          fetchUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(target)}`;
+          detailTabContainer.className = 'flex items-center bg-emerald-50 border border-emerald-300 rounded-lg shadow-sm px-3 py-1.5 transition-all select-none';
+          detailTabIcon.className = 'text-emerald-600 flex items-center mr-2';
+          detailTabName.className = 'text-xs font-semibold text-emerald-900 mr-2';
+          detailTabName.innerText = 'Sheet: KPI COMPLETED INFORMATION';
+          detailTabLockBadge.className = 'bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full';
         }
+      }
 
-        const res = await fetch(fetchUrl);
-        const text = await res.text();
-        if (text.includes('<html') || text.trim().length < 30) {
-          throw new Error('Format tidak valid');
-        }
+      renderAll();
+    }
 
-        const lines = text.split('\n').filter(l => l.trim() !== '');
-        const matrix = lines.map(splitCSVLine);
-
-        let hIdx = 0;
-        for (let i = 0; i < Math.min(8, matrix.length); i++) {
-          const rowStr = matrix[i].join(' ').toLowerCase();
-          if (rowStr.includes('material') || rowStr.includes('action') || rowStr.includes('corect') || rowStr.includes('case')) {
-            hIdx = i;
-            break;
-          }
-        }
-
-        const rawHeaders = matrix[hIdx] || [];
-        const headers = rawHeaders.map(h => h.replace(/["']/g, '').replace(/\s+/g, ' ').trim());
-        const hLow = headers.map(h => h.toLowerCase());
-
-        const dateIdx = hLow.findIndex(h => h.includes('dat') || h.includes('eview') || h.includes('tanggal'));
-        const matIdx = hLow.findIndex(h => h === 'material' || h === 'material ' || (h.includes('material') && !h.includes('number') && !h.includes('desc')));
-        const matNumIdx = hLow.findIndex(h => h.includes('material number') || h.includes('mat num') || h.includes('material desc') || h.includes('desc'));
-        const mtypIdx = hLow.findIndex(h => h.includes('mtyp') || h === 'mpn' || h.includes('mpn'));
-        
-        // Strict prioritization for Corective Action column to avoid grabbing status 'CLOSE'
-        let actIdx = hLow.findIndex(h => (h.includes('corect') || h.includes('correct')) && !h.includes('status'));
-        if (actIdx === -1) {
-          actIdx = hLow.findIndex(h => h.includes('action') && !h.includes('status') && !h.includes('case'));
-        }
-        if (actIdx === -1) {
-          actIdx = hLow.findIndex(h => h.includes('status'));
-        }
-
-        const items = [];
-        for (let i = hIdx + 1; i < matrix.length; i++) {
-          const row = matrix[i];
-          if (!row || row.length === 0 || row.every(c => c === '')) continue;
-
-          const dateVal = dateIdx !== -1 ? row[dateIdx] : '';
-          const dmy = parseDateToDMY(dateVal);
-
-          let actionVal = actIdx !== -1 && row[actIdx] ? row[actIdx].replace(/["']/g, '').trim() : '-';
-          const descVal = matNumIdx !== -1 && row[matNumIdx] ? row[matNumIdx].replace(/["']/g, '').trim() : '-';
-          const typeOrMpnVal = mtypIdx !== -1 && row[mtypIdx] ? row[mtypIdx].replace(/["']/g, '').trim() : '-';
-
-          items.push({
-            date: dateVal || '-',
-            day: dmy ? dmy.day : 0,
-            month: dmy ? dmy.month : 0,
-            year: dmy ? dmy.year : 0,
-            material: matIdx !== -1 && row[matIdx] ? row[matIdx].replace(/["']/g, '').trim() : '-',
-            materialNumber: descVal,
-            materialDesc: descVal,
-            mtyp: typeOrMpnVal,
-            mpn: typeOrMpnVal,
-            action: actionVal || '-'
-          });
-        }
-
-        return items;
-      } catch (err) {
-        console.warn('Gagal memuat detail:', target, err);
-        return [];
+    // Update label tanggal pada tombol header & pratinjau kalender
+    function updateDateLabel() {
+      const mShort = formatMonthShort(selectedMonth);
+      const label = document.getElementById('label-selected-date');
+      if (label) {
+        label.innerText = `${startDay} ${mShort} ${selectedYear} - ${endDay} ${mShort} ${selectedYear}`;
+      }
+      const chartMonthLabel = document.getElementById('chart-month-label');
+      if (chartMonthLabel) {
+        chartMonthLabel.innerText = `${formatMonthFull(selectedMonth)} ${selectedYear}`;
       }
     }
 
-    async function loadAllDetailSheets() {
-      // 1. Load KPI VALIDATION (GID: 1177910128)
-      const valItems = await fetchDetailItems(VALIDATION_GID);
-      if (valItems.length > 0) {
-        detailValItems = valItems;
+    function updateTempDatePreview() {
+      const mShort = formatMonthShort(tempMonth);
+      const preview = document.getElementById('temp-date-preview');
+      if (preview) {
+        const s = Math.min(tempStart, tempEnd);
+        const e = Math.max(tempStart, tempEnd);
+        preview.innerText = `Rentang Dipilih: ${s} ${mShort} ${tempYear} - ${e} ${mShort} ${tempYear}`;
       }
-
-      // 2. Load KPI COMPLETED INFORMATION (GID: 1502479532 dengan fallback)
-      let infoItems = await fetchDetailItems(INFO_GID);
-      if (infoItems.length === 0) {
-        infoItems = await fetchDetailItems('KPI COMPLETED INFORMATION');
-      }
-      if (infoItems.length === 0) {
-        infoItems = await fetchDetailItems('KPI INFORMATION COMPLETED');
-      }
-      if (infoItems.length > 0) {
-        detailInfoItems = infoItems;
-      }
-
-      // Sync active view
-      currentDetailItems = activeReport === 'validation' ? detailValItems : detailInfoItems;
-      renderDetailTable();
+      const startMonthEl = document.getElementById('cal-start-month-label');
+      const endMonthEl = document.getElementById('cal-end-month-label');
+      const monthBanner = `${mShort.toUpperCase()} ${tempYear}`;
+      if (startMonthEl) startMonthEl.innerText = monthBanner;
+      if (endMonthEl) endMonthEl.innerText = monthBanner;
     }
 
-    // FILTER & RENDER
+    // Render kalender dinamis sesuai bulan & tahun yang dipilih
+    function renderCalendars() {
+      const startContainer = document.getElementById('calendar-start-days');
+      const endContainer = document.getElementById('calendar-end-days');
+      if (!startContainer || !endContainer) return;
+
+      const maxDays = getDaysInMonth(tempMonth, tempYear);
+      const now = new Date();
+      const isCurrentMonthYear = (now.getMonth() + 1 === tempMonth) && (now.getFullYear() === tempYear);
+      const todayNum = now.getDate();
+
+      let startHtml = '';
+      let endHtml = '';
+      for (let d = 1; d <= maxDays; d++) {
+        const isStartSel = d === tempStart;
+        const isEndSel = d === tempEnd;
+        const inRange = d >= Math.min(tempStart, tempEnd) && d <= Math.max(tempStart, tempEnd);
+        const isToday = isCurrentMonthYear && d === todayNum;
+        const todayRing = isToday ? 'ring-1 ring-blue-500' : '';
+
+        const startCls = isStartSel
+          ? 'bg-blue-600 text-white font-bold shadow-sm'
+          : inRange
+            ? `bg-blue-50 text-blue-700 font-medium ${todayRing}`
+            : `text-gray-700 hover:bg-gray-100 ${todayRing}`;
+
+        const endCls = isEndSel
+          ? 'bg-blue-600 text-white font-bold shadow-sm'
+          : inRange
+            ? `bg-blue-50 text-blue-700 font-medium ${todayRing}`
+            : `text-gray-700 hover:bg-gray-100 ${todayRing}`;
+
+        startHtml += `<button type="button" onclick="selectStartDay(${d}, event)" class="w-7 h-7 rounded-full flex items-center justify-center transition-colors ${startCls}">${d}</button>`;
+        endHtml += `<button type="button" onclick="selectEndDay(${d}, event)" class="w-7 h-7 rounded-full flex items-center justify-center transition-colors ${endCls}">${d}</button>`;
+      }
+
+      startContainer.innerHTML = startHtml;
+      endContainer.innerHTML = endHtml;
+      updateTempDatePreview();
+    }
+
+    function changeCalendarMonth(delta, ev) {
+      if (ev) ev.stopPropagation();
+      tempMonth += delta;
+      if (tempMonth > 12) {
+        tempMonth = 1;
+        tempYear += 1;
+      } else if (tempMonth < 1) {
+        tempMonth = 12;
+        tempYear -= 1;
+      }
+      const maxDays = getDaysInMonth(tempMonth, tempYear);
+      if (tempStart > maxDays) tempStart = maxDays;
+      if (tempEnd > maxDays) tempEnd = maxDays;
+      renderCalendars();
+    }
+
+    function selectStartDay(day, e) {
+      if (e) e.stopPropagation();
+      tempStart = day;
+      if (tempEnd < tempStart) {
+        tempEnd = tempStart;
+      }
+      renderCalendars();
+    }
+
+    function selectEndDay(day, e) {
+      if (e) e.stopPropagation();
+      tempEnd = day;
+      if (tempEnd < tempStart) {
+        tempStart = tempEnd;
+      }
+      renderCalendars();
+    }
+
+    function setTodayDate(ev) {
+      if (ev) ev.stopPropagation();
+      const now = new Date();
+      selectedMonth = now.getMonth() + 1;
+      selectedYear = now.getFullYear();
+      startDay = now.getDate();
+      endDay = now.getDate();
+      tempMonth = selectedMonth;
+      tempYear = selectedYear;
+      tempStart = startDay;
+      tempEnd = endDay;
+      updateDateLabel();
+      renderCalendars();
+      const cardDate = document.getElementById('date-picker-card');
+      if (cardDate) cardDate.classList.add('hidden');
+      renderAll();
+    }
+
+    function setQuickDate(s, e, ev) {
+      if (ev) ev.stopPropagation();
+      const maxDays = getDaysInMonth(tempMonth, tempYear);
+      const safeStart = Math.min(s, maxDays);
+      const safeEnd = Math.min(e, maxDays);
+      selectedMonth = tempMonth;
+      selectedYear = tempYear;
+      tempStart = safeStart;
+      tempEnd = safeEnd;
+      startDay = safeStart;
+      endDay = safeEnd;
+      updateDateLabel();
+      renderCalendars();
+      const cardDate = document.getElementById('date-picker-card');
+      if (cardDate) cardDate.classList.add('hidden');
+      renderAll();
+    }
+
+    // Filter Data berdasarkan rentang tanggal terpilih
     function getFilteredResume() {
-      return resumeData.filter(d => {
-        if (d.month !== 11 || d.year !== 2026) return false;
-        return d.day >= startDay && d.day <= endDay;
-      });
+      return resumeData.filter(r => r.year === selectedYear && r.month === selectedMonth && r.day >= startDay && r.day <= endDay);
     }
 
-    function getFilteredDetails(items = currentDetailItems) {
-      return items.filter(item => {
-        if (item.month !== 11 || item.year !== 2026) return false;
-        return item.day >= startDay && item.day <= endDay;
-      });
+    function getFilteredDetails(reportType) {
+      const sourceList = reportType === 'validation' ? detailValItems : detailInfoItems;
+      return sourceList.filter(item => item.year === selectedYear && item.month === selectedMonth && item.day >= startDay && item.day <= endDay);
     }
 
-    function renderDashboard() {
-      const filtered = getFilteredResume();
+    // Render seluruh komponen dashboard
+    function renderAll() {
       const isVal = activeReport === 'validation';
+      const filteredRes = getFilteredResume();
 
-      // Totals
-      const totalPlan = filtered.reduce((acc, c) => acc + (isVal ? c.valPlan : c.infoPlan), 0);
-      const totalActual = filtered.reduce((acc, c) => acc + (isVal ? c.valActual : c.infoActual), 0);
-      
-      let overallAch = 0;
-      if (filtered.length > 0) {
-        const sumAch = filtered.reduce((acc, c) => acc + (isVal ? c.valAchievement : c.infoAchievement), 0);
-        overallAch = Number((sumAch / filtered.length).toFixed(1));
-      }
-
-      // Update Gauge
-      document.getElementById('gauge-percentage-text').innerText = `${overallAch}%`;
-      const arc = document.getElementById('gauge-progress');
-      arc.setAttribute('stroke', isVal ? '#2563eb' : '#059669');
-      const circumference = Math.PI * 80; // ~251.32
-      const clamped = Math.min(100, Math.max(0, overallAch));
-      const offset = circumference - (clamped / 100) * circumference;
-      arc.style.strokeDashoffset = offset;
-
-      document.getElementById('stat-total-plan').innerText = `${totalPlan} Item`;
-      document.getElementById('stat-total-actual').innerText = `${totalActual} Item`;
-
-      // Update Resume Table
-      document.getElementById('resume-count-badge').innerText = `${filtered.length} hari terpilih`;
-      const resumeTbody = document.getElementById('resume-table-body');
-      if (filtered.length === 0) {
-        resumeTbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-gray-400">Tidak ada data target pada tanggal yang dipilih.</td></tr>`;
-      } else {
-        resumeTbody.innerHTML = filtered.map(row => {
-          const plan = isVal ? row.valPlan : row.infoPlan;
-          const act = isVal ? row.valActual : row.infoActual;
-          const ach = isVal ? row.valAchievement : row.infoAchievement;
-          return `
-            <tr class="bg-white border-b border-gray-100 hover:bg-gray-50/70">
-              <td class="px-6 py-3 font-medium text-gray-800">${row.rawDate}</td>
-              <td class="px-6 py-3 text-right">${plan} Item</td>
-              <td class="px-6 py-3 text-right font-semibold text-gray-900">${act} Item</td>
-              <td class="px-6 py-3 text-right">
-                <span class="px-2 py-0.5 rounded text-xs font-semibold ${ach >= 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                  ${ach}%
-                </span>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      // Update Chart.js
-      updateChart(filtered, isVal);
-
-      // Update Detail Table
+      renderGauge(filteredRes, isVal);
+      renderChart(filteredRes, isVal);
+      renderResumeTable(filteredRes, isVal);
       renderDetailTable();
     }
 
-    function updateChart(data, isVal) {
-      const ctx = document.getElementById('dailyResumeChart').getContext('2d');
+    // Render Gauge Lingkaran SVG
+    function renderGauge(filteredRes, isVal) {
+      const progressArc = document.getElementById('gauge-progress');
+      const pctText = document.getElementById('gauge-percentage-text');
+      const totalPlanEl = document.getElementById('stat-total-plan');
+      const totalActEl = document.getElementById('stat-total-actual');
+
+      let totalPlan = 0;
+      let totalAct = 0;
+      let sumAch = 0;
+
+      filteredRes.forEach(r => {
+        totalPlan += isVal ? (r.valPlan || 0) : (r.infoPlan || 0);
+        totalAct += isVal ? (r.valActual || 0) : (r.infoActual || 0);
+        sumAch += isVal ? (r.valAchievement || 0) : (r.infoAchievement || 0);
+      });
+
+      const avgAch = filteredRes.length > 0 ? (sumAch / filteredRes.length) : 0;
+      const clampedPct = Math.min(100, Math.max(0, avgAch));
+      const circumference = 251.32;
+      const offset = circumference - (clampedPct / 100) * circumference;
+
+      if (progressArc) {
+        progressArc.style.strokeDashoffset = offset.toFixed(2);
+        progressArc.style.stroke = isVal ? '#2563eb' : '#059669';
+      }
+      if (pctText) pctText.innerText = `${avgAch.toFixed(1)}%`;
+      if (totalPlanEl) totalPlanEl.innerText = `${totalPlan} Item`;
+      if (totalActEl) totalActEl.innerText = `${totalAct} Item`;
+    }
+
+    // Render Grafik Chart.js
+    function renderChart(filteredRes, isVal) {
+      const canvas = document.getElementById('dailyResumeChart');
+      if (!canvas || !window.Chart) return;
+
+      const labels = filteredRes.map(r => r.rawDate);
+      const planSeries = filteredRes.map(r => isVal ? r.valPlan : r.infoPlan);
+      const actualSeries = filteredRes.map(r => isVal ? r.valActual : r.infoActual);
+      const achSeries = filteredRes.map(r => isVal ? r.valAchievement : r.infoAchievement);
+      const primaryColor = isVal ? '#2563eb' : '#059669';
+
       if (chartInstance) {
         chartInstance.destroy();
       }
 
-      const labels = data.map(d => d.rawDate.substring(0, 5));
-      const planData = data.map(d => isVal ? d.valPlan : d.infoPlan);
-      const actualData = data.map(d => isVal ? d.valActual : d.infoActual);
-      const achData = data.map(d => isVal ? d.valAchievement : d.infoAchievement);
-
-      chartInstance = new Chart(ctx, {
+      chartInstance = new Chart(canvas.getContext('2d'), {
         type: 'bar',
         data: {
           labels: labels,
           datasets: [
             {
-              type: 'line',
+              label: 'Plan Target',
+              data: planSeries,
+              backgroundColor: '#e2e8f0',
+              borderRadius: 4,
+              yAxisID: 'y',
+              order: 2
+            },
+            {
+              label: 'Actual Selesai',
+              data: actualSeries,
+              backgroundColor: primaryColor,
+              borderRadius: 4,
+              yAxisID: 'y',
+              order: 3
+            },
+            {
               label: 'Achievement (%)',
-              data: achData,
+              data: achSeries,
+              type: 'line',
               borderColor: '#f59e0b',
               backgroundColor: '#f59e0b',
               borderWidth: 2.5,
               pointRadius: 4,
               pointHoverRadius: 6,
+              tension: 0.25,
               yAxisID: 'y1',
-              tension: 0.2
-            },
-            {
-              type: 'bar',
-              label: 'Plan Target',
-              data: planData,
-              backgroundColor: '#e5e7eb',
-              borderRadius: 4,
-              barPercentage: 0.6,
-              yAxisID: 'y'
-            },
-            {
-              type: 'bar',
-              label: 'Actual Selesai',
-              data: actualData,
-              backgroundColor: isVal ? '#2563eb' : '#059669',
-              borderRadius: 4,
-              barPercentage: 0.6,
-              yAxisID: 'y'
+              order: 1
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
           plugins: {
             legend: {
               position: 'bottom',
               labels: {
-                boxWidth: 12,
-                font: { size: 11, family: 'Inter' }
-              }
-            },
-            tooltip: {
-              padding: 10,
-              callbacks: {
-                label: function(context) {
-                  let label = context.dataset.label || '';
-                  if (label.includes('Achievement')) {
-                    return `${label}: ${context.raw}%`;
-                  }
-                  return `${label}: ${context.raw} Item`;
-                }
+                font: { family: 'Inter', size: 11 },
+                usePointStyle: true,
+                padding: 16
               }
             }
           },
           scales: {
             x: {
               grid: { display: false },
-              ticks: { font: { size: 11, family: 'Inter' }, color: '#6b7280' }
+              ticks: { font: { family: 'Inter', size: 11 }, color: '#64748b' }
             },
             y: {
               type: 'linear',
+              display: true,
               position: 'left',
-              grid: { color: '#f3f4f6' },
-              ticks: { font: { size: 11, family: 'Inter' }, color: '#6b7280' }
+              beginAtZero: true,
+              grid: { color: '#f1f5f9' },
+              ticks: { font: { family: 'Inter', size: 11 }, color: '#64748b' }
             },
             y1: {
               type: 'linear',
+              display: true,
               position: 'right',
               min: 0,
-              max: 100,
+              max: 120,
               grid: { drawOnChartArea: false },
               ticks: {
-                callback: (val) => `${val}%`,
-                font: { size: 11, family: 'Inter' },
-                color: '#6b7280'
+                font: { family: 'Inter', size: 11 },
+                color: '#64748b',
+                callback: (val) => `${val}%`
               }
             }
           }
@@ -1025,108 +1222,161 @@
       });
     }
 
-    function renderDetailTable() {
-      const filtered = getFilteredDetails(currentDetailItems);
-      const countEl = document.getElementById('detail-record-count');
-      const isVal = activeReport === 'validation';
-      const sheetName = isVal ? 'KPI VALIDATION' : 'KPI COMPLETED INFORMATION';
-      countEl.innerText = `Menampilkan ${filtered.length} record item pada tanggal ${startDay} Nov - ${endDay} Nov 2026 (Sumber Sheet: ${sheetName})`;
+    // Render Tabel Resume Data Sheet
+    function renderResumeTable(filteredRes, isVal) {
+      const tbody = document.getElementById('resume-table-body');
+      const badge = document.getElementById('resume-count-badge');
+      if (badge) {
+        badge.innerText = `${filteredRes.length} hari terpilih`;
+      }
+      if (!tbody) return;
 
-      const tbody = document.getElementById('detail-table-body');
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Tidak ada record item untuk tanggal yang dipilih (${startDay} Nov - ${endDay} Nov 2026).</td></tr>`;
+      if (filteredRes.length === 0) {
+        const mShort = formatMonthShort(selectedMonth);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" class="px-6 py-6 text-center text-gray-400">
+              Tidak ada data resume pada rentang tanggal ${startDay} ${mShort} - ${endDay} ${mShort} ${selectedYear}.
+            </td>
+          </tr>
+        `;
         return;
       }
 
-      tbody.innerHTML = filtered.slice(0, 150).map(row => `
-        <tr class="bg-white border-b border-gray-100 hover:bg-gray-50/80">
-          <td class="px-5 py-2.5 whitespace-nowrap font-medium text-gray-700">${row.date}</td>
-          <td class="px-5 py-2.5 whitespace-nowrap font-semibold text-gray-900">${row.material}</td>
-          <td class="px-5 py-2.5 whitespace-nowrap font-mono text-gray-700 text-xs">${row.materialNumber}</td>
-          <td class="px-5 py-2.5 whitespace-nowrap text-center text-gray-600">${row.mtyp}</td>
-          <td class="px-5 py-2.5 whitespace-nowrap">
-            <span class="px-2 py-0.5 bg-gray-100 text-gray-800 rounded font-medium text-[11px] border border-gray-200">
-              ${row.action}
-            </span>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = filteredRes.map(row => {
+        const plan = isVal ? row.valPlan : row.infoPlan;
+        const act = isVal ? row.valActual : row.infoActual;
+        const ach = isVal ? row.valAchievement : row.infoAchievement;
+        const badgeCls = Number(ach) >= 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+
+        return `
+          <tr class="bg-white border-b border-gray-100 hover:bg-gray-50/80">
+            <td class="px-6 py-3 font-medium text-gray-800 whitespace-nowrap">${escapeHtml(row.rawDate)}</td>
+            <td class="px-6 py-3 text-right">${plan} Item</td>
+            <td class="px-6 py-3 text-right font-semibold text-gray-900">${act} Item</td>
+            <td class="px-6 py-3 text-right">
+              <span class="px-2 py-0.5 rounded text-xs font-semibold ${badgeCls}">${ach}%</span>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    // CALENDAR CONTROLS
-    function buildCalendars() {
-      const startGrid = document.getElementById('calendar-start-days');
-      const endGrid = document.getElementById('calendar-end-days');
+    // Render Tabel Detail Item Record (Terkunci sesuai Report)
+    function renderDetailTable() {
+      const isVal = activeReport === 'validation';
+      const filtered = getFilteredDetails(activeReport);
 
-      let startHtml = '';
-      let endHtml = '';
-
-      for (let day = 1; day <= 30; day++) {
-        const isStart = day === tempStart;
-        const isEnd = day === tempEnd;
-
-        startHtml += `
-          <div onclick="selectTempStart(${day})" class="p-1 cursor-pointer hover:bg-blue-100 rounded-full text-center font-medium ${isStart ? 'bg-blue-600 text-white font-bold' : 'text-gray-700'}">
-            ${day}
-          </div>
-        `;
-
-        endHtml += `
-          <div onclick="selectTempEnd(${day})" class="p-1 cursor-pointer hover:bg-blue-100 rounded-full text-center font-medium ${isEnd ? 'bg-blue-600 text-white font-bold' : 'text-gray-700'}">
-            ${day}
-          </div>
-        `;
+      const countEl = document.getElementById('detail-record-count');
+      if (countEl) {
+        const sheetName = isVal ? 'KPI VALIDATION' : 'KPI COMPLETED INFORMATION';
+        const mShort = formatMonthShort(selectedMonth);
+        countEl.innerText = `Menampilkan ${filtered.length} record item pada tanggal ${startDay} ${mShort} - ${endDay} ${mShort} ${selectedYear} (Sumber Sheet: ${sheetName})`;
       }
 
-      startGrid.innerHTML = startHtml;
-      endGrid.innerHTML = endHtml;
+      const thead = document.getElementById('detail-table-head');
+      if (thead) {
+        if (isVal) {
+          thead.innerHTML = `
+            <tr>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Review Date</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Material</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Material Desc</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Keterangan</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold text-center">CCP HASIL</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Corective Action</th>
+            </tr>
+          `;
+        } else {
+          thead.innerHTML = `
+            <tr>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Review Date</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Material</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Material Desc</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Component</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Brand</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Model</th>
+              <th class="px-5 py-3 whitespace-nowrap font-semibold">Corective Action</th>
+            </tr>
+          `;
+        }
+      }
+
+      const tbody = document.getElementById('detail-table-body');
+      if (!tbody) return;
+      const colSpan = isVal ? 6 : 7;
+
+      if (filtered.length === 0) {
+        const mShort = formatMonthShort(selectedMonth);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="${colSpan}" class="px-6 py-8 text-center text-gray-400">
+              Tidak ada record item ditemukan pada tanggal ${startDay} ${mShort} - ${endDay} ${mShort} ${selectedYear}.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      if (isVal) {
+        tbody.innerHTML = filtered.slice(0, 250).map(row => `
+          <tr class="bg-white border-b border-gray-100 hover:bg-gray-50/80">
+            <td class="px-5 py-2.5 whitespace-nowrap font-medium text-gray-700">${escapeHtml(row.date)}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap font-semibold text-gray-900">${escapeHtml(row.material)}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap font-mono text-gray-700 text-xs">${escapeHtml(row.materialDesc || row.materialNumber)}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap text-gray-700">${escapeHtml(row.keterangan || '-')}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap text-center font-semibold text-gray-800">${escapeHtml(row.ccp || '-')}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-800 rounded font-medium text-[11px] border border-gray-200">
+                ${escapeHtml(row.action)}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = filtered.slice(0, 250).map(row => `
+          <tr class="bg-white border-b border-gray-100 hover:bg-gray-50/80">
+            <td class="px-5 py-2.5 whitespace-nowrap font-medium text-gray-700">${escapeHtml(row.date)}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap font-semibold text-gray-900">${escapeHtml(row.material)}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap font-mono text-gray-700 text-xs">${escapeHtml(row.materialDesc || row.materialNumber)}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap text-gray-700">${escapeHtml(row.component || '-')}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap font-medium text-gray-800">${escapeHtml(row.brand || '-')}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap text-gray-700">${escapeHtml(row.model || '-')}</td>
+            <td class="px-5 py-2.5 whitespace-nowrap">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-800 rounded font-medium text-[11px] border border-gray-200">
+                ${escapeHtml(row.action)}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      }
     }
 
-    function selectTempStart(day) {
-      tempStart = day;
-      buildCalendars();
-    }
-
-    function selectTempEnd(day) {
-      tempEnd = day;
-      buildCalendars();
-    }
-
-    function setQuickDate(s, e) {
-      tempStart = s;
-      tempEnd = e;
-      startDay = s;
-      endDay = e;
-      document.getElementById('label-selected-date').innerText = `${startDay} Nov 2026 - ${endDay} Nov 2026`;
-      document.getElementById('date-picker-card').classList.add('hidden');
-      buildCalendars();
-      renderDashboard();
-      showToast(`Rentang tanggal diterapkan: ${startDay} Nov - ${endDay} Nov 2026`, 'success');
-    }
-
-    // EXPORT PDF GENERATOR (REPORT CATALOGING - SUPPORT COMBINED 2-IN-1)
+    // GENERATOR & DOWNLOAD PDF (GABUNGAN 2-IN-1 ATAU SATUAN)
     function generateAndDownloadPDF(mode = 'combined') {
-      showToast('Menyiapkan dokumen cetak PDF...', 'info');
+      const filteredRes = getFilteredResume();
+      const valDetails = getFilteredDetails('validation');
+      const infoDetails = getFilteredDetails('information');
 
-      const filteredResume = getFilteredResume();
-      const valDetails = getFilteredDetails(detailValItems);
-      const infoDetails = getFilteredDetails(detailInfoItems);
+      const totalValPlan = filteredRes.reduce((s, r) => s + (r.valPlan || 0), 0);
+      const totalValAct = filteredRes.reduce((s, r) => s + (r.valActual || 0), 0);
+      const avgValAch = filteredRes.length > 0
+        ? (filteredRes.reduce((s, r) => s + (r.valAchievement || 0), 0) / filteredRes.length).toFixed(1)
+        : '0.0';
 
-      const periodStr = `${startDay} Nov 2026 - ${endDay} Nov 2026`;
+      const totalInfoPlan = filteredRes.reduce((s, r) => s + (r.infoPlan || 0), 0);
+      const totalInfoAct = filteredRes.reduce((s, r) => s + (r.infoActual || 0), 0);
+      const avgInfoAch = filteredRes.length > 0
+        ? (filteredRes.reduce((s, r) => s + (r.infoAchievement || 0), 0) / filteredRes.length).toFixed(1)
+        : '0.0';
+
+      const mShort = formatMonthShort(selectedMonth);
+      const periodStr = `${startDay} ${mShort} ${selectedYear} - ${endDay} ${mShort} ${selectedYear}`;
       const generatedAt = new Date().toLocaleDateString('id-ID', {
         day: 'numeric', month: 'long', year: 'numeric'
       });
 
-      // Aggregations
-      const totalValPlan = filteredResume.reduce((a, b) => a + b.valPlan, 0);
-      const totalValAct = filteredResume.reduce((a, b) => a + b.valActual, 0);
-      const valAch = filteredResume.length > 0 ? (filteredResume.reduce((a, b) => a + b.valAchievement, 0) / filteredResume.length).toFixed(1) : '0.0';
-
-      const totalInfoPlan = filteredResume.reduce((a, b) => a + b.infoPlan, 0);
-      const totalInfoAct = filteredResume.reduce((a, b) => a + b.infoActual, 0);
-      const infoAch = filteredResume.length > 0 ? (filteredResume.reduce((a, b) => a + b.infoAchievement, 0) / filteredResume.length).toFixed(1) : '0.0';
-
-      const renderSectionVal = `
+      const valSectionHtml = `
         <div class="section-title">
           <span class="section-badge badge-blue">LAPORAN 1</span>
           <span>KPI VALIDATION PERFORMANCE</span>
@@ -1135,7 +1385,7 @@
         <div class="kpi-cards">
           <div class="kpi-card">
             <div class="kpi-card-label">Rata-rata Pencapaian</div>
-            <div class="kpi-card-value" style="color: #2563eb;">${valAch}%</div>
+            <div class="kpi-card-value" style="color: #2563eb;">${avgValAch}%</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-card-label">Total Plan Target</div>
@@ -1147,11 +1397,11 @@
           </div>
         </div>
 
-        <div class="sub-title">A. Ringkasan Resume Harian Target vs Actual (Validation)</div>
+        <div class="sub-title">A. Ringkasan Resume Harian Target vs Actual (KPI Validation)</div>
         <table class="tbl">
           <thead>
             <tr>
-              <th style="width: 35px;" class="text-center">No</th>
+              <th style="width: 32px;" class="text-center">No</th>
               <th>Review Date</th>
               <th class="text-right">Plan Target</th>
               <th class="text-right">Actual Selesai</th>
@@ -1159,13 +1409,19 @@
             </tr>
           </thead>
           <tbody>
-            ${filteredResume.map((d, i) => `
+            ${filteredRes.length === 0 ? `
+              <tr><td colspan="5" class="text-center" style="padding: 12px; color: #9ca3af;">Tidak ada data resume pada periode ini.</td></tr>
+            ` : filteredRes.map((d, i) => `
               <tr>
                 <td class="text-center">${i + 1}</td>
-                <td style="font-weight: 500;">${d.rawDate}</td>
+                <td style="font-weight: 500;">${escapeHtml(d.rawDate)}</td>
                 <td class="text-right">${d.valPlan} Item</td>
                 <td class="text-right" style="font-weight: 600;">${d.valActual} Item</td>
-                <td class="text-right" style="font-weight: 700; color: #1e3a8a;">${d.valAchievement}%</td>
+                <td class="text-right">
+                  <span class="badge-ach ${Number(d.valAchievement) >= 100 ? 'badge-ach-good' : 'badge-ach-warn'}">
+                    ${d.valAchievement}%
+                  </span>
+                </td>
               </tr>
             `).join('')}
           </tbody>
@@ -1175,32 +1431,34 @@
         <table class="tbl">
           <thead>
             <tr>
-              <th style="width: 35px;" class="text-center">No</th>
+              <th style="width: 30px;" class="text-center">No</th>
               <th>Review Date</th>
               <th>Material</th>
-              <th>Material Number</th>
-              <th class="text-center">MTyp</th>
+              <th>Material Desc</th>
+              <th>Keterangan</th>
+              <th class="text-center">CCP HASIL</th>
               <th>Corective Action</th>
             </tr>
           </thead>
           <tbody>
             ${valDetails.length === 0 ? `
-              <tr><td colspan="6" class="text-center" style="padding: 14px; color: #9ca3af;">Tidak ada record item pada rentang tanggal ini.</td></tr>
+              <tr><td colspan="7" class="text-center" style="padding: 14px; color: #9ca3af;">Tidak ada record item pada rentang tanggal ini.</td></tr>
             ` : valDetails.map((r, i) => `
               <tr>
                 <td class="text-center" style="color: #6b7280;">${i + 1}</td>
-                <td style="white-space: nowrap; font-weight: 500;">${r.date}</td>
-                <td style="font-weight: 600; color: #111827;">${r.material}</td>
-                <td style="font-family: monospace; font-size: 9.5px; color: #374151;">${r.materialNumber}</td>
-                <td class="text-center">${r.mtyp}</td>
-                <td><span class="badge-action">${r.action}</span></td>
+                <td style="white-space: nowrap; font-weight: 500;">${escapeHtml(r.date)}</td>
+                <td style="font-weight: 600; color: #111827;">${escapeHtml(r.material)}</td>
+                <td style="font-family: monospace; font-size: 9px; color: #374151;">${escapeHtml(r.materialDesc || r.materialNumber)}</td>
+                <td>${escapeHtml(r.keterangan || '-')}</td>
+                <td class="text-center" style="font-weight: 600;">${escapeHtml(r.ccp || '-')}</td>
+                <td><span class="badge-action">${escapeHtml(r.action)}</span></td>
               </tr>
             `).join('')}
           </tbody>
         </table>
       `;
 
-      const renderSectionInfo = `
+      const infoSectionHtml = `
         <div class="section-title">
           <span class="section-badge badge-green">LAPORAN 2</span>
           <span>KPI INFORMATION COMPLETED PERFORMANCE</span>
@@ -1209,7 +1467,7 @@
         <div class="kpi-cards">
           <div class="kpi-card">
             <div class="kpi-card-label">Rata-rata Pencapaian</div>
-            <div class="kpi-card-value" style="color: #059669;">${infoAch}%</div>
+            <div class="kpi-card-value" style="color: #059669;">${avgInfoAch}%</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-card-label">Total Plan Target</div>
@@ -1221,11 +1479,11 @@
           </div>
         </div>
 
-        <div class="sub-title">A. Ringkasan Resume Harian Target vs Actual (Information Completed)</div>
+        <div class="sub-title">A. Ringkasan Resume Harian Target vs Actual (KPI Information Completed)</div>
         <table class="tbl">
           <thead>
             <tr>
-              <th style="width: 35px;" class="text-center">No</th>
+              <th style="width: 32px;" class="text-center">No</th>
               <th>Review Date</th>
               <th class="text-right">Plan Target</th>
               <th class="text-right">Actual Selesai</th>
@@ -1233,287 +1491,298 @@
             </tr>
           </thead>
           <tbody>
-            ${filteredResume.map((d, i) => `
+            ${filteredRes.length === 0 ? `
+              <tr><td colspan="5" class="text-center" style="padding: 12px; color: #9ca3af;">Tidak ada data resume pada periode ini.</td></tr>
+            ` : filteredRes.map((d, i) => `
               <tr>
                 <td class="text-center">${i + 1}</td>
-                <td style="font-weight: 500;">${d.rawDate}</td>
+                <td style="font-weight: 500;">${escapeHtml(d.rawDate)}</td>
                 <td class="text-right">${d.infoPlan} Item</td>
                 <td class="text-right" style="font-weight: 600;">${d.infoActual} Item</td>
-                <td class="text-right" style="font-weight: 700; color: #065f46;">${d.infoAchievement}%</td>
+                <td class="text-right">
+                  <span class="badge-ach ${Number(d.infoAchievement) >= 100 ? 'badge-ach-good' : 'badge-ach-warn'}">
+                    ${d.infoAchievement}%
+                  </span>
+                </td>
               </tr>
             `).join('')}
           </tbody>
         </table>
 
-        <div class="sub-title">B. Detail Item Record Information Completed (${infoDetails.length} Items)</div>
+        <div class="sub-title">B. Detail Item Record KPI Information Completed (${infoDetails.length} Items)</div>
         <table class="tbl">
           <thead>
             <tr>
-              <th style="width: 35px;" class="text-center">No</th>
+              <th style="width: 30px;" class="text-center">No</th>
               <th>Review Date</th>
               <th>Material</th>
               <th>Material Desc</th>
-              <th class="text-center">MPN</th>
+              <th>Component</th>
+              <th>Brand</th>
+              <th>Model</th>
               <th>Corective Action</th>
             </tr>
           </thead>
           <tbody>
             ${infoDetails.length === 0 ? `
-              <tr><td colspan="6" class="text-center" style="padding: 14px; color: #9ca3af;">Tidak ada record item pada rentang tanggal ini.</td></tr>
+              <tr><td colspan="8" class="text-center" style="padding: 14px; color: #9ca3af;">Tidak ada record item pada rentang tanggal ini.</td></tr>
             ` : infoDetails.map((r, i) => `
               <tr>
                 <td class="text-center" style="color: #6b7280;">${i + 1}</td>
-                <td style="white-space: nowrap; font-weight: 500;">${r.date}</td>
-                <td style="font-weight: 600; color: #111827;">${r.material}</td>
-                <td style="font-family: monospace; font-size: 9.5px; color: #374151;">${r.materialDesc || r.materialNumber}</td>
-                <td class="text-center">${r.mpn || r.mtyp}</td>
-                <td><span class="badge-action">${r.action}</span></td>
+                <td style="white-space: nowrap; font-weight: 500;">${escapeHtml(r.date)}</td>
+                <td style="font-weight: 600; color: #111827;">${escapeHtml(r.material)}</td>
+                <td style="font-family: monospace; font-size: 9px; color: #374151;">${escapeHtml(r.materialDesc || r.materialNumber)}</td>
+                <td>${escapeHtml(r.component || '-')}</td>
+                <td style="font-weight: 500;">${escapeHtml(r.brand || '-')}</td>
+                <td>${escapeHtml(r.model || '-')}</td>
+                <td><span class="badge-action">${escapeHtml(r.action)}</span></td>
               </tr>
             `).join('')}
           </tbody>
         </table>
       `;
 
-      const printHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <title>REPORT CATALOGING - ${periodStr}</title>
-          <style>
-            @page { size: A4 portrait; margin: 12mm 15mm; }
-            * { box-sizing: border-box; }
-            body {
-              font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-              color: #1f2937;
-              background: #fff;
-              margin: 0;
-              padding: 0;
-              font-size: 11px;
-              line-height: 1.4;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-            .header-doc {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              border-bottom: 2.5px solid #2563eb;
-              padding-bottom: 8px;
-              margin-bottom: 12px;
-            }
-            .brand { display: flex; align-items: center; gap: 8px; }
-            .brand-logo {
-              background: #2563eb;
-              color: #fff;
-              font-weight: 800;
-              font-size: 13px;
-              padding: 5px 9px;
-              border-radius: 4px;
-            }
-            .title-banner {
-              background: #f8fafc;
-              border-left: 4px solid #2563eb;
-              padding: 10px 14px;
-              margin-bottom: 16px;
-              border-radius: 0 4px 4px 0;
-            }
-            .title-banner h1 {
-              margin: 0;
-              font-size: 14px;
-              color: #1e3a8a;
-              font-weight: 700;
-              text-transform: uppercase;
-            }
-            .title-banner p { margin: 3px 0 0 0; font-size: 10.5px; color: #4b5563; }
-            .section-title {
-              font-size: 12px;
-              font-weight: 700;
-              color: #111827;
-              margin: 18px 0 8px 0;
-              display: flex;
-              align-items: center;
-              gap: 8px;
-            }
-            .section-badge {
-              display: inline-block;
-              padding: 2px 7px;
-              border-radius: 3px;
-              font-size: 9px;
-              font-weight: 700;
-              color: white;
-              text-transform: uppercase;
-            }
-            .badge-blue { background: #2563eb; }
-            .badge-green { background: #059669; }
-            .kpi-cards {
-              display: grid;
-              grid-template-columns: repeat(3, 1fr);
-              gap: 10px;
-              margin-bottom: 14px;
-            }
-            .kpi-card {
-              border: 1px solid #e5e7eb;
-              border-radius: 6px;
-              padding: 8px 12px;
-              background: #f9fafb;
-            }
-            .kpi-card-label {
-              font-size: 9px;
-              text-transform: uppercase;
-              color: #6b7280;
-              font-weight: 700;
-            }
-            .kpi-card-value {
-              font-size: 17px;
-              font-weight: 700;
-              color: #111827;
-              margin-top: 1px;
-            }
-            .sub-title {
-              font-size: 11px;
-              font-weight: 700;
-              color: #1f2937;
-              margin: 14px 0 6px 0;
-            }
-            .tbl {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 14px;
-              font-size: 10px;
-            }
-            .tbl th {
-              background: #f3f4f6;
-              border: 1px solid #d1d5db;
-              padding: 6px 8px;
-              font-weight: 700;
-              color: #374151;
-              text-align: left;
-            }
-            .tbl td {
-              border: 1px solid #e5e7eb;
-              padding: 5px 7px;
-              color: #374151;
-            }
-            .tbl tr:nth-child(even) { background: #fafafa; }
-            .text-right { text-align: right; }
-            .text-center { text-align: center; }
-            .badge-action {
-              display: inline-block;
-              background: #f1f5f9;
-              color: #1e293b;
-              padding: 2px 6px;
-              border-radius: 3px;
-              font-size: 9px;
-              font-weight: 500;
-              border: 1px solid #e2e8f0;
-            }
-            .page-break { page-break-before: always; margin-top: 24px; }
-          </style>
-        </head>
-        <body>
-          <div class="header-doc">
-            <div class="brand">
-              <span class="brand-logo">DS</span>
-              <div>
-                <strong style="font-size: 13px; color: #1e3a8a;">REPORT CATALOGING</strong><br>
-                <span style="font-size: 9.5px; color: #6b7280;">Official Performance & Record Verification Document</span>
-              </div>
-            </div>
-            <div style="text-align: right; font-size: 10px; color: #6b7280;">
-              <div><strong>Periode:</strong> ${periodStr}</div>
-              <div><strong>Tanggal Cetak:</strong> ${generatedAt}</div>
-            </div>
-          </div>
+      const bodySections = mode === 'combined'
+        ? `${valSectionHtml}<div class="page-break"></div>${infoSectionHtml}`
+        : mode === 'validation'
+          ? valSectionHtml
+          : infoSectionHtml;
 
-          <div class="title-banner">
-            <h1>Report Daily Validation dan Information Complete Cataloging</h1>
-            <p>Laporan rekonsiliasi capaian harian dan rincian data baris item cataloging logistik</p>
-          </div>
+      const printHtml = `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>REPORT CATALOGING - ${periodStr}</title>
+  <style>
+    @page { size: A4 portrait; margin: 12mm 14mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+      color: #1f2937;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      font-size: 11px;
+      line-height: 1.4;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .header-doc {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2.5px solid #2563eb;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+    .header-brand { display: flex; align-items: center; gap: 10px; }
+    .brand-logo {
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 5px 9px;
+      border-radius: 4px;
+    }
+    .doc-meta { text-align: right; font-size: 10px; color: #6b7280; }
+    .title-banner {
+      background: #f8fafc;
+      border-left: 4px solid #2563eb;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+    .title-banner h1 {
+      margin: 0;
+      font-size: 14px;
+      color: #1e3a8a;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .title-banner p { margin: 3px 0 0 0; font-size: 10.5px; color: #4b5563; }
+    .section-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #111827;
+      margin: 14px 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sub-title { font-size: 11px; font-weight: 600; color: #374151; margin: 10px 0 5px 0; }
+    .section-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .badge-blue { background: #2563eb; }
+    .badge-green { background: #059669; }
+    .kpi-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .kpi-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 8px 12px;
+      background: #f9fafb;
+    }
+    .kpi-card-label { font-size: 9px; text-transform: uppercase; color: #6b7280; font-weight: 700; }
+    .kpi-card-value { font-size: 16px; font-weight: 700; color: #111827; margin-top: 2px; }
+    .tbl { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 10px; }
+    .tbl th {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      padding: 6px 8px;
+      font-weight: 700;
+      color: #374151;
+      text-align: left;
+    }
+    .tbl td { border: 1px solid #e5e7eb; padding: 5px 7px; color: #374151; }
+    .tbl tr:nth-child(even) { background: #fafafa; }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    .badge-ach { display: inline-block; padding: 1px 6px; border-radius: 3px; font-weight: 700; font-size: 9.5px; }
+    .badge-ach-good { background: #d1fae5; color: #065f46; }
+    .badge-ach-warn { background: #fef3c7; color: #92400e; }
+    .badge-action {
+      display: inline-block;
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 500;
+      border: 1px solid #e2e8f0;
+    }
+    .page-break { page-break-before: always; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="header-doc">
+    <div class="header-brand">
+      <span class="brand-logo">DS</span>
+      <div>
+        <strong style="font-size: 13px; color: #1e3a8a;">REPORT CATALOGING</strong><br>
+        <span style="font-size: 9.5px; color: #6b7280;">Official Performance & Record Verification Document</span>
+      </div>
+    </div>
+    <div class="doc-meta">
+      <div><strong>Periode:</strong> ${periodStr}</div>
+      <div><strong>Tanggal Cetak:</strong> ${generatedAt}</div>
+    </div>
+  </div>
 
-          ${mode === 'combined' ? (
-            `${renderSectionVal}
-             <div class="page-break"></div>
-             ${renderSectionInfo}`
-          ) : mode === 'validation' ? (
-            renderSectionVal
-          ) : (
-            renderSectionInfo
-          )}
+  <div class="title-banner">
+    <h1>Report Daily Validation dan Information Complete Cataloging</h1>
+    <p>Laporan rekonsiliasi capaian harian dan rincian data baris item cataloging logistik</p>
+  </div>
 
-          <script>
-            window.onload = function() {
-              window.focus();
-              setTimeout(function() { window.print(); }, 400);
-            };
-          <\/script>
-        </body>
-        </html>
-      `;
+  ${bodySections}
 
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.open();
-        printWindow.document.write(printHtml);
-        printWindow.document.close();
-      } else {
-        showToast('Izin popup diblokir peramban. Harap izinkan popup untuk mencetak PDF.', 'error');
+  <script>
+    window.onload = function() {
+      window.focus();
+      setTimeout(function() {
+        window.print();
+      }, 350);
+    };
+  <\/script>
+</body>
+</html>`;
+
+      const printWin = window.open('', '_blank');
+      if (!printWin) {
+        showToast('Popup browser diblokir. Izinkan popup untuk mencetak/menyimpan PDF.', 'warning');
+        return;
       }
+      printWin.document.open();
+      printWin.document.write(printHtml);
+      printWin.document.close();
+      showToast('Dokumen PDF siap dicetak / disimpan!', 'success');
     }
 
-    // INITIALIZATION & EVENT LISTENERS
-    window.onload = function() {
-      lucide.createIcons();
-      buildCalendars();
-      updateDetailSelectorUI(activeReport);
+    // Event bindings & initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
 
-      // Sidebar Toggle
-      const sidebar = document.getElementById('sidebar');
+      // Sidebar toggle
       const btnToggle = document.getElementById('btn-toggle-sidebar');
-      btnToggle.addEventListener('click', () => {
-        isSidebarOpen = !isSidebarOpen;
-        if (isSidebarOpen) {
-          sidebar.classList.remove('w-16');
-          sidebar.classList.add('w-64');
-          document.querySelectorAll('.sidebar-label').forEach(el => el.classList.remove('hidden'));
-        } else {
-          sidebar.classList.remove('w-64');
-          sidebar.classList.add('w-16');
-          document.querySelectorAll('.sidebar-label').forEach(el => el.classList.add('hidden'));
-        }
-      });
+      const sidebar = document.getElementById('sidebar');
+      if (btnToggle && sidebar) {
+        btnToggle.addEventListener('click', () => {
+          isSidebarOpen = !isSidebarOpen;
+          sidebar.classList.toggle('w-64', isSidebarOpen);
+          sidebar.classList.toggle('w-16', !isSidebarOpen);
+          document.querySelectorAll('.sidebar-label').forEach(el => {
+            el.classList.toggle('hidden', !isSidebarOpen);
+          });
+        });
+      }
 
-      // Date Picker Toggle
+      // Date Picker controls
       const btnDate = document.getElementById('btn-date-picker');
-      const dateCard = document.getElementById('date-picker-card');
-      btnDate.addEventListener('click', () => {
-        dateCard.classList.toggle('hidden');
-      });
+      const cardDate = document.getElementById('date-picker-card');
+      const btnCancel = document.getElementById('btn-cancel-date');
+      const btnApply = document.getElementById('btn-apply-date');
 
-      document.getElementById('btn-cancel-date').addEventListener('click', () => {
-        dateCard.classList.add('hidden');
-      });
+      if (btnDate && cardDate) {
+        btnDate.addEventListener('click', (e) => {
+          e.stopPropagation();
+          tempMonth = selectedMonth;
+          tempYear = selectedYear;
+          tempStart = startDay;
+          tempEnd = endDay;
+          renderCalendars();
+          cardDate.classList.toggle('hidden');
+        });
 
-      document.getElementById('btn-apply-date').addEventListener('click', () => {
-        if (tempStart <= tempEnd) {
-          startDay = tempStart;
-          endDay = tempEnd;
-        } else {
-          startDay = tempEnd;
-          endDay = tempStart;
+        cardDate.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+
+      if (btnCancel && cardDate) {
+        btnCancel.addEventListener('click', (e) => {
+          e.stopPropagation();
+          cardDate.classList.add('hidden');
+        });
+      }
+
+      if (btnApply && cardDate) {
+        btnApply.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectedMonth = tempMonth;
+          selectedYear = tempYear;
+          startDay = Math.min(tempStart, tempEnd);
+          endDay = Math.max(tempStart, tempEnd);
+          updateDateLabel();
+          cardDate.classList.add('hidden');
+          renderAll();
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        if (cardDate && !cardDate.classList.contains('hidden')) {
+          if (!cardDate.contains(e.target) && (!btnDate || !btnDate.contains(e.target))) {
+            cardDate.classList.add('hidden');
+          }
         }
-        document.getElementById('label-selected-date').innerText = `${startDay} Nov 2026 - ${endDay} Nov 2026`;
-        dateCard.classList.add('hidden');
-        renderDashboard();
-        showToast(`Rentang tanggal diperbarui ke: ${startDay} - ${endDay} Nov 2026`, 'success');
       });
 
-      // Start fetching data
+      // Initialize fallback & render immediately, then sync live Google Sheets
       initFallbackData();
-      renderDashboard();
-      fetchMainResume();
-      loadAllDetailSheets();
-    };
+      updateDateLabel();
+      renderCalendars();
+      switchReport('validation');
+      fetchAllSheets();
+    });
   </script>
 </body>
 </html>
